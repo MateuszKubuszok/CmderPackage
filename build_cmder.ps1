@@ -1,7 +1,7 @@
 Import-Module BitsTransfer
 
 # Helper functions
-###############################################################################
+################################################################################
 
 Function DownloadFileIfNecessary($source, $targetDir, $targetName) {
   $target = $targetDir + '\' + $targetName;
@@ -21,6 +21,8 @@ Function EnsureFileDownloaded($source, $target) {
   if (!(Test-Path $target)) {
     Write-Host "	Failed to download $source";
     exit 1;
+  } else {
+    Write-Host "  $source downloaded successfully";
   }
 }
 
@@ -43,24 +45,27 @@ $CmderDir = $CurrentDir + '\cmder'
 $CygwinDir = $CmderDir + '\cygwin'
 
 Function InstallCmder() {
+  Write-Host
   $cmderInstalledMarker = $Tmp + '\cmder.marker'
   if (!(Test-Path $cmderInstalledMarker)) {
     Write-Host "Obtaining cmder:";
     $cmderURL = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip';
     $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp 'cmder.zip';
-	if (ExtractZIPFile $cmderZIP $CurrentDir) {
-	  echo $null > $cmderInstalledMarker
-	  Write-Host "cmder extracted";
-	} else {
-	  Write-Host "cmder extraction failed!";
-	  exit 1
-	}
+    New-Item $CmderDir -type directory -Force;
+    if (ExtractZIPFile $cmderZIP $CurrentDir) {
+      echo $null > $cmderInstalledMarker
+      Write-Host "cmder extracted";
+    } else {
+      Write-Host "cmder extraction failed!";
+      exit 1
+    }
   } else {
     Write-Host "cmder already extracted";
   }
 }
 
 Function InstallCygwin() {
+  Write-Host
   $cygwinInstalledMarker = $Tmp + '\cygwin.marker'
   if (!(Test-Path $cygwinInstalledMarker)) {
     Write-Host "Obtaining Cygwin:";
@@ -143,8 +148,10 @@ Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
   Write-Host "target dir: $CmderDir"
+
   InstallCmder;
   InstallCygwin;
+  # http://downloads.sourceforge.net/project/libusb-win32/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip?r=http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/&ts=1408518422&use_mirror=kent
 }
 
 # Run script

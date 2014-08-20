@@ -1,4 +1,4 @@
-cmder/
-tmp/
+/cmder/
+/tmp/
 setup.log
 setup.log.full

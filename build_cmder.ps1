@@ -10,7 +10,7 @@ Function DownloadFileIfNecessary($source, $targetDir, $targetName) {
     if (!(Test-Path $targetDir)) {
       New-Item $targetDir -type directory -Force;
     }
-  Write-Host "  downloading $source into $target...";
+    Write-Host "  downloading $source into $target...";
     $webclient.DownloadFile($source, $target);
   }
   EnsureFileDownloaded $source $target;
@@ -30,9 +30,8 @@ Function ExtractZIPFile($file, $target) {
   Write-Host "  Extracting $file into $target...";
   $shell = New-Object -com shell.application
   $zip = $shell.NameSpace($file)
-  foreach($item in $zip.items()) {
-    $shell.NameSpace($target).CopyHere($item)
-  }
+  $overrideSilent = 0x14
+  $shell.NameSpace($target).CopyHere($zip.items(), $overrideSilent)
   return 1;
 }
 
@@ -72,7 +71,8 @@ Function InstallCygwin() {
     $cygwinURL = 'https://cygwin.com/setup-x86_64.exe';
     $cygwinEXE = DownloadFileIfNecessary $cygwinURL $Tmp 'setup-x86_64.exe';
     $cygwinArgs = @(
-        '--no-admin', '--upgrade-also', '--no-desktop', '--no-startmenu',
+        '--no-admin', '--upgrade-also', '--quiet-mode',
+        '--no-desktop', '--no-startmenu', '--no-shortcuts',
         # Directories `
         '--root', $CygwinDir,
         '--local-package-dir', $Tmp,
@@ -106,6 +106,7 @@ Function InstallCygwin() {
         '-P', 'ocaml-base',
         '-P', 'ocaml-campl4',
         '-P', 'pylint',
+        '-P', 'scons',
         '-P', 'subversion',
         # Category Editors `
         '-P', 'emacs',
@@ -131,13 +132,15 @@ Function InstallCygwin() {
         # Category Web `
         '-P', 'wget')
     Write-Host '  Running Cygwin setup...'
-    $cygwinInstallation = Start-Process -FilePath $cygwinEXE -ArgumentList $cygwinArgs -NoNewWindow -Wait
+    $cygwinInstallation = Start-Process -FilePath $cygwinEXE -ArgumentList $cygwinArgs -PassThru -NoNewWindow -Wait
     if ($cygwinInstallation.ExitCode -eq 0) {
       echo $null > $cygwinInstalledMarker
       Write-Host "  Cygwin installed into $CygwinDir!";
     } else {
       Write-Host '  Cygwin installation failed!';
-      exit 1
+      Write-Host $cygwinInstallation.ExitCode
+      Write-Host $cygwinInstallation.ExitCode
+      exit $cygwinInstallation.ExitCode
     }
   } else {
     Write-Host "Cygwin already installed";
@@ -152,7 +155,7 @@ Function InstallAptCyg() {
     $aptCygURL = "https://apt-cyg.googlecode.com/svn/trunk/apt-cyg"
     $aptCygDir = $cygwinDir + '\bin'
     $aptCygFile = DownloadFileIfNecessary $aptCygURL $aptCygDir 'apt-cyg';
-    if (!(Test-Path $aptCygFile)) {
+    if (Test-Path $aptCygFile) {
       echo $null > $aptCygInstalledMarker
       Write-Host "  apt-cyg installed into $aptCygDir!";
     } else {
@@ -171,6 +174,25 @@ Function BuildLogic() {
 
   InstallCmder;
   InstallCygwin;
+  InstallAptCyg;
+  #TODO Install depot-tools
+  #TODO Install far manager
+  #TODO Install far manager plugin for conemu
+  #TODO Install portable JVM
+  #TODO Install portable JDK ?
+  #TODO Install Clojure
+  #TODO Install lein and lein.bat
+  #TODO Install gradle-1.11
+  #TODO Install atom
+  #TODO Install lighttable
+  #TODO Install nightcore
+  #TODO Install sublime text portable
+  #TODO Create symlinks to applications
+  #TODO Install git-prompt
+  #TODO Install settings
+
+  #TODO Create separate script for adding depot-tools to the windows path
+  #TODO Create separate script for building and installing boost
 }
 
 # Run script

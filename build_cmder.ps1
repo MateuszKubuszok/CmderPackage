@@ -167,6 +167,31 @@ Function InstallAptCyg() {
   }
 }
 
+Function InstallDepotTools() {
+  Write-Host
+  $depotToolsInstalledMarker = $Tmp + '\depottools.marker'
+  $depotToolsDir = $CygwinDir + '\opt\depot_tools'
+  if (!(Test-Path $depotToolsInstalledMarker)) {
+    Write-Host "Obtaining depot-tools:";
+    $env:Path = $env:Path + ';' + $CmderDir + '\vendor\msysgit\bin'
+    $gitEXE = 'git'
+    $gitArgs = @(
+        'clone'
+        'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+        $depotToolsDir)
+    $depotToolsInstallation = Start-Process -FilePath $gitEXE -ArgumentList $gitArgs -PassThru -NoNewWindow -Wait
+    if ($depotToolsInstallation.ExitCode -eq 0) {
+      echo $null > $depotToolsInstalledMarker
+      Write-Host "  depottools installed into $depotToolsDir!";
+    } else {
+      Write-Host '  depottools installation failed!';
+      exit 1;
+    }
+  } else {
+    Write-Host "depottools already installed";
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -175,7 +200,7 @@ Function BuildLogic() {
   InstallCmder;
   InstallCygwin;
   InstallAptCyg;
-  #TODO Install depot-tools
+  InstallDepotTools;
   #TODO Install far manager
   #TODO Install far manager plugin for conemu
   #TODO Install portable JVM
@@ -193,6 +218,7 @@ Function BuildLogic() {
 
   #TODO Create separate script for adding depot-tools to the windows path
   #TODO Create separate script for building and installing boost
+  #TODO Create separate script for cleaning and downloading depottools toolchain
 }
 
 # Run script

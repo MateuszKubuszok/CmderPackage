@@ -5,6 +5,7 @@ Builds cmder portable installation with sevaral features preinstalled:
 
  * Cygwin environment,
  * apt-cyg script,
+ * depot_tools,
  * some preconfiguration files.
 
 Enabling running scripts
@@ -79,3 +80,8 @@ many ported packages.
 
 [https://code.google.com/p/apt-cyg/](apt-cyg) - script for Cygwin allowing
 package management in a apt-get like manner.
+
+### depot_tools
+
+[http://www.chromium.org/developers/how-tos/depottools](depot_tools) - scripts
+useful when working with Google code.

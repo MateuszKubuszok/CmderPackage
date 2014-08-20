@@ -6,6 +6,7 @@ Builds cmder portable installation with sevaral features preinstalled:
  * Cygwin environment,
  * apt-cyg script,
  * depot_tools,
+ * Far manager,
  * some preconfiguration files.
 
 Enabling running scripts
@@ -85,3 +86,8 @@ package management in a apt-get like manner.
 
 [http://www.chromium.org/developers/how-tos/depottools](depot_tools) - scripts
 useful when working with Google code.
+
+### Far manager
+
+[http://www.farmanager.com/](Far manager) - Total Commander like manager in
+a command line.

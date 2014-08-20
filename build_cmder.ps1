@@ -53,7 +53,7 @@ Function InstallCmder() {
     New-Item $CmderDir -type directory -Force;
     if (ExtractZIPFile $cmderZIP $CurrentDir) {
       echo $null > $cmderInstalledMarker
-      Write-Host "  Cmder extracted!";
+      Write-Host "  Cmder extracted into $CmderDir!";
     } else {
       Write-Host "  Cmder extraction failed!";
       exit 1
@@ -145,6 +145,7 @@ Function InstallCygwin() {
   } else {
     Write-Host "Cygwin already installed";
   }
+  $env:Path = $env:Path + ';' + $CygwinDir + '\bin'
 }
 
 Function InstallAptCyg() {
@@ -173,7 +174,6 @@ Function InstallDepotTools() {
   $depotToolsDir = $CygwinDir + '\opt\depot_tools'
   if (!(Test-Path $depotToolsInstalledMarker)) {
     Write-Host "Obtaining depot-tools:";
-    $env:Path = $env:Path + ';' + $CmderDir + '\vendor\msysgit\bin'
     $gitEXE = 'git'
     $gitArgs = @(
         'clone'
@@ -192,6 +192,31 @@ Function InstallDepotTools() {
   }
 }
 
+Function InstallFar() {
+  Write-Host
+  $farInstalledMarker = $Tmp + '\far.marker'
+  if (!(Test-Path $farInstalledMarker)) {
+    Write-Host "Obtaining Far:";
+    $farURL = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z';
+    DownloadFileIfNecessary $farURL $Tmp 'Far30b4040.x64.20140810.7z';
+    $far7Z = 'tmp/Far30b4040.x64.20140810.7z'
+    $farDir = 'cmder/far';
+    $7zaEXE = $CygwinDir + '\lib\p7zip\7za.exe';
+    $7zaArgs = @('x', $far7Z, "-o$farDir", '-y')
+    New-Item $farDir -type directory -Force;
+    $farInstallation = Start-Process -FilePath $7zaEXE -ArgumentList $7zaArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    if ($farInstallation.ExitCode -eq 0) {
+      echo $null > $farInstalledMarker
+      Write-Host "  Far extracted into $farDir!";
+    } else {
+      Write-Host "  Far extraction failed!";
+      exit 1
+    }
+  } else {
+    Write-Host "Far already extracted";
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -201,7 +226,7 @@ Function BuildLogic() {
   InstallCygwin;
   InstallAptCyg;
   InstallDepotTools;
-  #TODO Install far manager
+  InstallFar;
   #TODO Install far manager plugin for conemu
   #TODO Install portable JVM
   #TODO Install portable JDK ?

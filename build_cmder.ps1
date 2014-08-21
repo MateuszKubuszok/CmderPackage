@@ -28,6 +28,7 @@ Function EnsureFileDownloaded($source, $target) {
 
 Function ExtractZIPFile($file, $target) {
   Write-Host "  Extracting $file into $target..."
+  New-Item $target -type directory -Force
   $overrideSilent = 0x14
   $shell = New-Object -com shell.application
   $zip = $shell.NameSpace($file)
@@ -66,7 +67,6 @@ Function InstallCmder() {
     Write-Host "Obtaining Cmder:"
     $cmderURL = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip'
     $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp 'cmder.zip'
-    New-Item $CmderDir -type directory -Force
     if (ExtractZIPFile $cmderZIP $CurrentDir) {
       echo $null > $cmderInstalledMarker
       Write-Host "  Cmder extracted into $CmderDir!"
@@ -282,6 +282,26 @@ Function InstallPortableJVM() {
   }
 }
 
+Function InstallClojure() {
+  Write-Host
+  $clojureInstalledMarker = $Tmp + '\clojure.marker'
+  if (!(Test-Path $clojureInstalledMarker)) {
+    Write-Host "Obtaining Clojure:"
+    $clojureURL = 'http://central.maven.org/maven2/org/clojure/clojure/1.6.0/clojure-1.6.0.zip'
+    $clojureZIP = DownloadFileIfNecessary $clojureURL $Tmp 'clojure-1.6.0.zip'
+    $clojureDir = $CmderDir + '\clojure'
+    if (ExtractZIPFile ($clojureZIP + '\clojure-1.6.0') $clojureDir) {
+      echo $null > $clojureInstalledMarker
+      Write-Host "  Clojure extracted into $clojureDir!"
+    } else {
+      Write-Host "  Clojure extraction failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "Clojure already extracted"
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -295,7 +315,7 @@ Function BuildLogic() {
   InstallFarPlugin
   InstallPortableJVM;
   #TODO Install portable JDK ?
-  #TODO Install Clojure
+  InstallClojure
   #TODO Install lein and lein.bat
   #TODO Install gradle-1.11
   #TODO Install atom

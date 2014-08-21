@@ -4,34 +4,35 @@ Import-Module BitsTransfer
 ################################################################################
 
 Function DownloadFileIfNecessary($source, $targetDir, $targetName) {
-  $target = $targetDir + '\' + $targetName;
+  $target = $targetDir + '\' + $targetName
   if (!(Test-Path $target)) {
-    $webclient = New-Object System.Net.WebClient;
+    $webclient = New-Object System.Net.WebClient
     if (!(Test-Path $targetDir)) {
-      New-Item $targetDir -type directory -Force;
+      New-Item $targetDir -type directory -Force
     }
-    Write-Host "  downloading $source into $target...";
-    $webclient.DownloadFile($source, $target);
+    Write-Host "  downloading $source into $target..."
+    $webclient.DownloadFile($source, $target)
   }
-  EnsureFileDownloaded $source $target;
-  return $target;
+  EnsureFileDownloaded $source $target
+  return $target
 }
 
 Function EnsureFileDownloaded($source, $target) {
   if (!(Test-Path $target)) {
-    Write-Host "  failed to download $source";
-    exit 1;
+    Write-Host "  failed to download $source"
+    exit 1
   } else {
-    Write-Host "  $source downloaded successfully";
+    Write-Host "  $source downloaded successfully"
   }
 }
 
 Function ExtractZIPFile($file, $target) {
-  Write-Host "  Extracting $file into $target...";
+  Write-Host "  Extracting $file into $target..."
   $overrideSilent = 0x14
   $shell = New-Object -com shell.application
-  $shell.NameSpace($target).CopyHere($shell.NameSpace($file).items(), $overrideSilent)
-  return 1;
+  $zip = $shell.NameSpace($file)
+  $shell.NameSpace($target).CopyHere($zip.items(), $overrideSilent)
+  return 1
 }
 
 # Build logic
@@ -46,19 +47,19 @@ Function InstallCmder() {
   Write-Host
   $cmderInstalledMarker = $Tmp + '\cmder.marker'
   if (!(Test-Path $cmderInstalledMarker)) {
-    Write-Host "Obtaining Cmder:";
-    $cmderURL = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip';
-    $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp 'cmder.zip';
-    New-Item $CmderDir -type directory -Force;
+    Write-Host "Obtaining Cmder:"
+    $cmderURL = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip'
+    $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp 'cmder.zip'
+    New-Item $CmderDir -type directory -Force
     if (ExtractZIPFile $cmderZIP $CurrentDir) {
       echo $null > $cmderInstalledMarker
-      Write-Host "  Cmder extracted into $CmderDir!";
+      Write-Host "  Cmder extracted into $CmderDir!"
     } else {
-      Write-Host "  Cmder extraction failed!";
+      Write-Host "  Cmder extraction failed!"
       exit 1
     }
   } else {
-    Write-Host "Cmder already extracted";
+    Write-Host "Cmder already extracted"
   }
 }
 
@@ -66,9 +67,9 @@ Function InstallCygwin() {
   Write-Host
   $cygwinInstalledMarker = $Tmp + '\cygwin.marker'
   if (!(Test-Path $cygwinInstalledMarker)) {
-    Write-Host "Obtaining Cygwin:";
-    $cygwinURL = 'https://cygwin.com/setup-x86_64.exe';
-    $cygwinEXE = DownloadFileIfNecessary $cygwinURL $Tmp 'setup-x86_64.exe';
+    Write-Host "Obtaining Cygwin:"
+    $cygwinURL = 'https://cygwin.com/setup-x86_64.exe'
+    $cygwinEXE = DownloadFileIfNecessary $cygwinURL $Tmp 'setup-x86_64.exe'
     $cygwinArgs = @(
         '--no-admin', '--upgrade-also', '--quiet-mode',
         '--no-desktop', '--no-startmenu', '--no-shortcuts',
@@ -134,36 +135,36 @@ Function InstallCygwin() {
     $cygwinInstallation = Start-Process -FilePath $cygwinEXE -ArgumentList $cygwinArgs -PassThru -NoNewWindow -Wait
     if ($cygwinInstallation.ExitCode -eq 0) {
       echo $null > $cygwinInstalledMarker
-      Write-Host "  Cygwin installed into $CygwinDir!";
+      Write-Host "  Cygwin installed into $CygwinDir!"
     } else {
-      Write-Host '  Cygwin installation failed!';
+      Write-Host '  Cygwin installation failed!'
       Write-Host $cygwinInstallation.ExitCode
       Write-Host $cygwinInstallation.ExitCode
       exit $cygwinInstallation.ExitCode
     }
   } else {
-    Write-Host "Cygwin already installed";
+    Write-Host "Cygwin already installed"
   }
-  $env:Path = $env:Path + ';' + $CygwinDir + '\bin'
+  $env:Path = $env:Path + '' + $CygwinDir + '\bin'
 }
 
 Function InstallAptCyg() {
   Write-Host
   $aptCygInstalledMarker = $Tmp + '\aptcyg.marker'
   if (!(Test-Path $aptCygInstalledMarker)) {
-    Write-Host "Obtaining apt-cyg:";
+    Write-Host "Obtaining apt-cyg:"
     $aptCygURL = "https://apt-cyg.googlecode.com/svn/trunk/apt-cyg"
     $aptCygDir = $cygwinDir + '\bin'
-    $aptCygFile = DownloadFileIfNecessary $aptCygURL $aptCygDir 'apt-cyg';
+    $aptCygFile = DownloadFileIfNecessary $aptCygURL $aptCygDir 'apt-cyg'
     if (Test-Path $aptCygFile) {
       echo $null > $aptCygInstalledMarker
-      Write-Host "  apt-cyg installed into $aptCygDir!";
+      Write-Host "  apt-cyg installed into $aptCygDir!"
     } else {
-      Write-Host '  apt-cyg installation failed!';
-      exit 1;
+      Write-Host '  apt-cyg installation failed!'
+      exit 1
     }
   } else {
-    Write-Host "apt-cyg already installed";
+    Write-Host "apt-cyg already installed"
   }
 }
 
@@ -171,24 +172,24 @@ Function InstallDepotTools() {
   Write-Host
   $depotToolsInstalledMarker = $Tmp + '\depottools.marker'
   if (!(Test-Path $depotToolsInstalledMarker)) {
-    Write-Host "Obtaining depot-tools:";
+    Write-Host "Obtaining depot-tools:"
     $depotToolsDir = $CygwinDir + '\opt\depot_tools'
     $gitEXE = 'git'
     $gitArgs = @(
         'clone'
         'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
         $depotToolsDir)
-    New-Item $depotToolsDir -type directory -Force;
+    New-Item $depotToolsDir -type directory -Force
     $depotToolsInstallation = Start-Process -FilePath $gitEXE -ArgumentList $gitArgs -PassThru -NoNewWindow -Wait
     if ($depotToolsInstallation.ExitCode -eq 0) {
       echo $null > $depotToolsInstalledMarker
-      Write-Host "  depottools installed into $depotToolsDir!";
+      Write-Host "  depottools installed into $depotToolsDir!"
     } else {
-      Write-Host '  depottools installation failed!';
-      exit 1;
+      Write-Host '  depottools installation failed!'
+      exit 1
     }
   } else {
-    Write-Host "depottools already installed";
+    Write-Host "depottools already installed"
   }
 }
 
@@ -196,24 +197,24 @@ Function InstallFar() {
   Write-Host
   $farInstalledMarker = $Tmp + '\far.marker'
   if (!(Test-Path $farInstalledMarker)) {
-    Write-Host "Obtaining Far:";
-    $farURL = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z';
-    DownloadFileIfNecessary $farURL $Tmp 'Far30b4040.x64.20140810.7z';
+    Write-Host "Obtaining Far:"
+    $farURL = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z'
+    DownloadFileIfNecessary $farURL $Tmp 'Far30b4040.x64.20140810.7z'
     $far7Z = 'tmp/Far30b4040.x64.20140810.7z'
-    $farDir = 'cmder/far';
-    $7zaEXE = $CygwinDir + '\lib\p7zip\7za.exe';
+    $farDir = 'cmder/far'
+    $7zaEXE = $CygwinDir + '\lib\p7zip\7za.exe'
     $7zaArgs = @('x', $far7Z, "-o$farDir", '-y')
-    New-Item $farDir -type directory -Force;
+    New-Item $farDir -type directory -Force
     $farInstallation = Start-Process -FilePath $7zaEXE -ArgumentList $7zaArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
     if ($farInstallation.ExitCode -eq 0) {
       echo $null > $farInstalledMarker
-      Write-Host "  Far extracted into $farDir!";
+      Write-Host "  Far extracted into $farDir!"
     } else {
-      Write-Host "  Far extraction failed!";
+      Write-Host "  Far extraction failed!"
       exit 1
     }
   } else {
-    Write-Host "Far already extracted";
+    Write-Host "Far already extracted"
   }
 }
 
@@ -221,22 +222,23 @@ Function InstallFarPlugin() {
   Write-Host
   $farPluginInstalledMarker = $Tmp + '\farplugin.marker'
   if (!(Test-Path $farPluginInstalledMarker)) {
-    Write-Host "Obtaining Far Plugin:";
+    Write-Host "Obtaining Far Plugin:"
     $source = $CmderDir + '\vendor\conemu-maximus5\plugins\ConEmu'
     $target = $CmderDir + '\far\Plugins\ConEmu'
-    New-Item $target -type directory -Force;
+    New-Item $target -type directory -Force
     $overrideSilent = 0x14
     $shell = New-Object -com shell.application
-    $shell.NameSpace($target).CopyHere($shell.NameSpace($file).items(), $overrideSilent)
+    $directory = $shell.NameSpace($source)
+    $shell.NameSpace($target).CopyHere($directory.items(), $overrideSilent)
     if (Test-Path $target) {
       echo $null > $farPluginInstalledMarker
-      Write-Host "  Far plugin installed into $target!";
+      Write-Host "  Far plugin installed into $target!"
     } else {
-      Write-Host "  Far plugin installation failed!";
+      Write-Host "  Far plugin installation failed!"
       exit 1
     }
   } else {
-    Write-Host "Far already extracted";
+    Write-Host "Far plugin already installed"
   }
 }
 
@@ -245,12 +247,12 @@ Function BuildLogic() {
   Write-Host "tmp dir: $Tmp"
   Write-Host "target dir: $CmderDir"
 
-  InstallCmder;
-  InstallCygwin;
-  InstallAptCyg;
-  InstallDepotTools;
-  InstallFar;
-  ;InstallFarPlugin;
+  InstallCmder
+  InstallCygwin
+  InstallAptCyg
+  InstallDepotTools
+  InstallFar
+  InstallFarPlugin
   #TODO Install portable JVM
   #TODO Install portable JDK ?
   #TODO Install Clojure
@@ -272,4 +274,4 @@ Function BuildLogic() {
 # Run script
 ################################################################################
 
-BuildLogic;
+BuildLogic

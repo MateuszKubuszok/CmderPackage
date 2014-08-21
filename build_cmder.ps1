@@ -64,19 +64,10 @@ Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
   return $target
 }
 
-Function CreateWindowsSymlink($from, $to) {
-  if (!(Test-Path $to)) {
-    $cmd = 'cmd'
-    $args = @('/c', 'mklink', '$from', '$to')
-    Start-Process $cmd -Verb RunAs -ArgumentList $args
-  }
-  EnsureSymlinkCreated $from $to
-}
-
 Function CreateCygwinSymlink($from, $to) {
-  if (!(Test-Path $to)) {
-    $cmd = $CygwinDir + '\bin\ln'
-    $args = @('-s', '$to', '$from')
+  if (!(Test-Path $from)) {
+    $cmd = $CmderDir + '\vendor\msysgit\bin\ln'
+    $args = @('-s', $to, $from)
     Start-Process -FilePath $cmd -ArgumentList $args -PassThru -NoNewWindow -Wait
   }
   EnsureSymlinkCreated $from $to
@@ -84,7 +75,7 @@ Function CreateCygwinSymlink($from, $to) {
 
 Function EnsureSymlinkCreated($from, $to) {
   if (!(Test-Path $from)) {
-    Write-Host "  failed to symlink $from -> $to"
+    Write-Host "  failed to symlink $from -> $to!"
     exit 1
   } else {
     Write-Host "  symlink $from -> $to created"
@@ -443,7 +434,7 @@ Function InstallSublimeText() {
     $overrideSilent = 0x14
     $shell = New-Object -com shell.application
     $zip = $shell.NameSpace($sublimeTextZIP)
-    $shell.NameSpace($sublimeTextDir).CopyHere($zip, $overrideSilent)
+    $shell.NameSpace($sublimeTextDir).CopyHere($zip.items(), $overrideSilent)
     echo $null > $sublimeTextInstalledMarker
     Write-Host "  Sublime Text 3 extracted into $sublimeTextDir!"
   } else {
@@ -476,13 +467,10 @@ Function CreateSymlinks() {
   $symlinkCreatedMarker = $Tmp + '\symlinks.marker'
   if (!(Test-Path $symlinkCreatedMarker)) {
     Write-Host "Creating symlinks:"
-    CreateWindowsSymlink "$CmderDir\tools\atom" "$CygwinDir\usr\local\bin\atom"
-    CreateWindowsSymlink "$CmderDir\tools\LightTable" "$CygwinDir\usr\local\bin\LightTable"
-    CreateWindowsSymlink "$CmderDir\tools\sublime-text" "$CygwinDir\usr\local\bin\sublime-text"
-    CreateCygwinSymlink "$CygwinDir\usr\local\bin\atom.exe" "$CygwinDir\usr\local\bin\atom\atom.exe"
-    CreateCygwinSymlink "$CygwinDir\usr\local\bin\light-table.exe" "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
-    CreateCygwinSymlink "$CygwinDir\usr\local\bin\nightcode.jar" "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
-    CreateCygwinSymlink "$CygwinDir\usr\local\bin\sublime-text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime-text.exe"
+    CreateCygwinSymlink "$CygwinDir\bin\atom.exe" "$CygwinDir\usr\local\bin\atom\atom.exe"
+    CreateCygwinSymlink "$CygwinDir\bin\light-table.exe" "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
+    CreateCygwinSymlink "$CygwinDir\bin\nightcode.jar" "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
+    CreateCygwinSymlink "$CygwinDir\bin\sublime_text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime_text.exe"
     echo $null > $symlinkCreatedMarker
     Write-Host "  symlinks created!"
   } else {
@@ -546,7 +534,7 @@ Function BuildLogic() {
   InstallLightTable
   InstallNightCode
   InstallSublimeText
-  #CreateSymlinks
+  CreateSymlinks
   DownloadIcons
   InstallGitPrompt
   InstallSettings

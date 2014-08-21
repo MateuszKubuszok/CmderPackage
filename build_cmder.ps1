@@ -318,6 +318,26 @@ Function InstallLeiningen() {
   }
 }
 
+Function InstallGradle() {
+  Write-Host
+  $gradleInstalledMarker = $Tmp + '\gradle.marker'
+  if (!(Test-Path $gradleInstalledMarker)) {
+    Write-Host "Obtaining Gradle:"
+    $gradleURL = 'https://services.gradle.org/distributions/gradle-1.11-all.zip'
+    $gradleZIP = DownloadFileIfNecessary $gradleURL $Tmp 'gradle-1.11-all.zip'
+    $gradleDir = $CmderDir + '\tools'
+    if (ExtractZIPFile $gradleZIP $gradleDir) {
+      echo $null > $gradleInstalledMarker
+      Write-Host "  Gradle extracted into $gradleDir!"
+    } else {
+      Write-Host "  Gradle extraction failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "Gradle already extracted"
+  }
+}
+
 Function InstallSettings() {
   Write-Host
   $settingsInstalledMarker = $Tmp + '\settings.marker'
@@ -350,7 +370,7 @@ Function BuildLogic() {
   #TODO Install portable JDK ?
   InstallClojure
   InstallLeiningen
-  #TODO Install gradle-1.11
+  InstallGradle
   #TODO Install atom
   #TODO Install lighttable
   #TODO Install nightcore

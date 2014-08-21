@@ -35,6 +35,22 @@ Function ExtractZIPFile($file, $target) {
   return 1
 }
 
+Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
+  $target = $targetDir + '\' + $targetName
+  if (!(Test-Path $target)) {
+    $wgetEXE = $CygwinDir + '\bin\wget.exe'
+    $wgetArgs = @(
+        '--no-check-certificate', '--no-cookies',
+        '--header', '"Cookie: oraclelicense=accept-securebackup-cookie"',
+        $source,
+        '-O', $target)
+    Write-Host "  downloading $source into $target..."
+    Start-Process -FilePath $wgetEXE -ArgumentList $wgetArgs -PassThru -NoNewWindow -Wait
+  }
+  EnsureFileDownloaded $source $target
+  return $target
+}
+
 # Build logic
 ################################################################################
 
@@ -222,7 +238,7 @@ Function InstallFarPlugin() {
   Write-Host
   $farPluginInstalledMarker = $Tmp + '\farplugin.marker'
   if (!(Test-Path $farPluginInstalledMarker)) {
-    Write-Host "Obtaining Far Plugin:"
+    Write-Host "Obtaining Far plugin for Conemu integration:"
     $source = $CmderDir + '\vendor\conemu-maximus5\plugins\ConEmu'
     $target = $CmderDir + '\far\Plugins\ConEmu'
     New-Item $target -type directory -Force
@@ -242,6 +258,30 @@ Function InstallFarPlugin() {
   }
 }
 
+Function InstallPortableJVM() {
+  Write-Host
+  $jvmInstalledMarker = $Tmp + '\jvm.marker'
+  if (!(Test-Path $jvmInstalledMarker)) {
+    Write-Host "Obtaining portable JVM:"
+    $jvmURL = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-windows-x64.tar.gz'
+    DownloadFromOracleIfNecessary $jvmURL $Tmp 'jre-8u20-windows-x64.tar.gz'
+    $target = $CmderDir + '\jvm'
+    New-Item $target -type directory -Force
+    $tarEXE = $CygwinDir + '\bin\tar.exe'
+    $tarArgs = @('-C', $target, '-xvzf', './tmp/jre-8u20-windows-x64.tar.gz', '--strip-components=1')
+    $jvmInstallation = Start-Process -FilePath $tarEXE -ArgumentList $tarArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    if ($jvmInstallation.ExitCode -eq 0) {
+      echo $null > $jvmInstalledMarker
+      Write-Host "  JVM installed into $target!"
+    } else {
+      Write-Host "  JVM installation failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "Portable JVM already installed"
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -253,7 +293,7 @@ Function BuildLogic() {
   InstallDepotTools
   InstallFar
   InstallFarPlugin
-  #TODO Install portable JVM
+  InstallPortableJVM;
   #TODO Install portable JDK ?
   #TODO Install Clojure
   #TODO Install lein and lein.bat

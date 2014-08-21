@@ -64,6 +64,33 @@ Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
   return $target
 }
 
+Function CreateWindowsSymlink($from, $to) {
+  if (!(Test-Path $to)) {
+    $cmd = 'cmd'
+    $args = @('/c', 'mklink', '$from', '$to')
+    Start-Process $cmd -Verb RunAs -ArgumentList $args
+  }
+  EnsureSymlinkCreated $from $to
+}
+
+Function CreateCygwinSymlink($from, $to) {
+  if (!(Test-Path $to)) {
+    $cmd = $CygwinDir + '\bin\ln'
+    $args = @('-s', '$to', '$from')
+    Start-Process -FilePath $cmd -ArgumentList $args -PassThru -NoNewWindow -Wait
+  }
+  EnsureSymlinkCreated $from $to
+}
+
+Function EnsureSymlinkCreated($from, $to) {
+  if (!(Test-Path $from)) {
+    Write-Host "  failed to symlink $from -> $to"
+    exit 1
+  } else {
+    Write-Host "  symlink $from -> $to created"
+  }
+}
+
 # Build logic
 ################################################################################
 
@@ -424,6 +451,25 @@ Function InstallSublimeText() {
   }
 }
 
+Function CreateSymlinks() {
+  Write-Host
+  $symlinkCreatedMarker = $Tmp + '\symlinks.marker'
+  if (!(Test-Path $symlinkCreatedMarker)) {
+    Write-Host "Creating symlinks:"
+    CreateWindowsSymlink "$CmderDir\tools\atom" "$CygwinDir\usr\local\bin\atom"
+    CreateWindowsSymlink "$CmderDir\tools\LightTable" "$CygwinDir\usr\local\bin\LightTable"
+    CreateWindowsSymlink "$CmderDir\tools\sublime-text" "$CygwinDir\usr\local\bin\sublime-text"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\atom.exe" "$CygwinDir\usr\local\bin\atom\atom.exe"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\light-table.exe" "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\nightcode.jar" "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\sublime-text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime-text.exe"
+    echo $null > $symlinkCreatedMarker
+    Write-Host "  symlinks created!"
+  } else {
+    Write-Host "Symlinks already created"
+  }
+}
+
 Function InstallSettings() {
   Write-Host
   $settingsInstalledMarker = $Tmp + '\settings.marker'
@@ -461,7 +507,7 @@ Function BuildLogic() {
   InstallLightTable
   InstallNightCode
   InstallSublimeText
-  #TODO Create symlinks to applications (both cygwin and windows one)
+  #CreateSymlinks
   #TODO Install git-prompt
   InstallSettings
 

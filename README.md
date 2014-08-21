@@ -1,12 +1,15 @@
 cmder package builder
 ===
 
-Builds cmder portable installation with sevaral features preinstalled:
+Builds cmder portable installation with several features preinstalled:
 
  * Cygwin environment,
  * apt-cyg script,
  * depot_tools,
  * Far manager,
+ * Clojure REPL,
+ * Python REPL,
+ * Ruby REPL,
  * some preconfiguration files.
 
 Enabling running scripts
@@ -18,7 +21,7 @@ When you see warning:
     disabled on this system. Please see "get-help about_signing" for more
     details
 
-run following line in a powershell with admin rights:
+run following line in a PowerShell with admin rights:
 
     Set-ExecutionPolicy RemoteSigned
 
@@ -27,14 +30,13 @@ and confirm your choice with `Y`.
 Building
 ---
 
-Run in a powershell (make sure you are running the one located in `syswow64` not
+Run in a PowerShell (make sure you are running the one located in `syswow64` not
 `system32`):
 
     .\build_cmder.ps1
 
-In the process several windows might appear. Let them do the job. Some of them
-will allow you to choose some configurations. You can change them if you know
-what you are doing.
+In the process Cygwin installer will appear - let it do the job. If you want to
+change installation use `setup_cygwin.ps1` script.
 
 If Cygwin installation crashes at the beginning try switching from x86 to x64
 PowerShell (or from x64 to x86).
@@ -64,7 +66,7 @@ Used software
 
 ### Conemu
 
-[https://code.google.com/p/conemu-maximus5/](Conemu) - constains original Conemu
+[https://code.google.com/p/conemu-maximus5/](Conemu) - contains original Conemu
 software without any additional addons.
 
 ### Cmder

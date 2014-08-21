@@ -302,6 +302,22 @@ Function InstallClojure() {
   }
 }
 
+Function InstallLeiningen() {
+  Write-Host
+  $leiningenInstalledMarker = $Tmp + '\leiningen.marker'
+  if (!(Test-Path $leiningenInstalledMarker)) {
+    Write-Host "Obtaining Leiningen:"
+    $leinDir = $CygwinDir + '\bin'
+    $leinBarDir = $CmderDir + '\bin'
+    DownloadFileIfNecessary 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' $leinDir 'lein'
+    DownloadFileIfNecessary 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat' $leinBarDir 'lein.bat'
+    echo $null > $leiningenInstalledMarker
+    Write-Host "  Leiningen obtained!"
+  } else {
+    Write-Host "Leiningen already obtained"
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -316,7 +332,7 @@ Function BuildLogic() {
   InstallPortableJVM;
   #TODO Install portable JDK ?
   InstallClojure
-  #TODO Install lein and lein.bat
+  InstallLeiningen
   #TODO Install gradle-1.11
   #TODO Install atom
   #TODO Install lighttable

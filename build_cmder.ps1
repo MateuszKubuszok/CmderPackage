@@ -404,6 +404,26 @@ Function InstallNightCode() {
   }
 }
 
+Function InstallSublimeText() {
+  Write-Host
+  $sublimeTextInstalledMarker = $Tmp + '\sublimetext.marker'
+  if (!(Test-Path $sublimeTextInstalledMarker)) {
+    Write-Host "Obtaining Sublime Text 3:"
+    $sublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3059 x64.zip"'
+    $sublimeTextZIP = DownloadWithWgetIfNecessary $sublimeTextURL $Tmp 'SublimeText3.zip'
+    $sublimeTextDir = $CygwinDir + '\usr\local\bin\sublime-text'
+    New-Item $sublimeTextDir -type directory -Force
+    $overrideSilent = 0x14
+    $shell = New-Object -com shell.application
+    $zip = $shell.NameSpace($sublimeTextZIP)
+    $shell.NameSpace($sublimeTextDir).CopyHere($zip, $overrideSilent)
+    echo $null > $sublimeTextInstalledMarker
+    Write-Host "  Sublime Text 3 extracted into $sublimeTextDir!"
+  } else {
+    Write-Host "Sublime Text 3 already extracted"
+  }
+}
+
 Function InstallSettings() {
   Write-Host
   $settingsInstalledMarker = $Tmp + '\settings.marker'
@@ -440,7 +460,7 @@ Function BuildLogic() {
   InstallAtom
   InstallLightTable
   InstallNightCode
-  #TODO Install sublime text portable
+  InstallSublimeText
   #TODO Create symlinks to applications (both cygwin and windows one)
   #TODO Install git-prompt
   InstallSettings

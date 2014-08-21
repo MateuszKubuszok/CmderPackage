@@ -318,6 +318,23 @@ Function InstallLeiningen() {
   }
 }
 
+Function InstallSettings() {
+  Write-Host
+  $settingsInstalledMarker = $Tmp + '\settings.marker'
+  if (!(Test-Path $settingsInstalledMarker)) {
+    Write-Host "Copying settings:"
+    $overrideSilent = 0x14
+    $shell = New-Object -com shell.application
+    $source = $shell.NameSpace($CurrentDir + '\preconfigs')
+    $target = $shell.NameSpace($CurrentDir)
+    $target.CopyHere($source.items(), $overrideSilent)
+    echo $null > $settingsInstalledMarker
+    Write-Host "  settings copied!"
+  } else {
+    Write-Host "Settings already copied"
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -340,7 +357,7 @@ Function BuildLogic() {
   #TODO Install sublime text portable
   #TODO Create symlinks to applications
   #TODO Install git-prompt
-  #TODO Install settings
+  InstallSettings
 
   #TODO Create separate script for adding depot-tools to the windows path
   #TODO Create separate script for building and installing boost

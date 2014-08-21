@@ -451,6 +451,26 @@ Function InstallSublimeText() {
   }
 }
 
+Function InstallGitPrompt() {
+  Write-Host
+  $gitPromptInstalledMarker = $Tmp + '\gitprompt.marker'
+  if (!(Test-Path $gitPromptInstalledMarker)) {
+    Write-Host "Obtaining git-prompt.sh:"
+    $source = $CmderDir + '\vendor\msysgit\etc\git-prompt.sh'
+    $target = $CygwinDir + '\etc'
+    Copy-Item $source $target
+    if (Test-Path $target) {
+      echo $null > $gitPromptInstalledMarker
+      Write-Host "  git-prompt.sh installed into $target!"
+    } else {
+      Write-Host "  git-prompt.sh installation failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "git-prompt.sh already installed"
+  }
+}
+
 Function CreateSymlinks() {
   Write-Host
   $symlinkCreatedMarker = $Tmp + '\symlinks.marker'
@@ -528,7 +548,7 @@ Function BuildLogic() {
   InstallSublimeText
   #CreateSymlinks
   DownloadIcons
-  #TODO Install git-prompt
+  InstallGitPrompt
   InstallSettings
 
   #TODO Create separate script for adding depot-tools to the windows path

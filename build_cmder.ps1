@@ -200,7 +200,7 @@ Function InstallCygwin() {
   } else {
     Write-Host "Cygwin already installed"
   }
-  $env:Path = $env:Path + '' + $CygwinDir + '\bin'
+  $env:Path += ";$CygwinDir\bin"
 }
 
 Function InstallAptCyg() {
@@ -306,8 +306,8 @@ Function InstallPortableJVM() {
     DownloadFromOracleIfNecessary $jvmURL $Tmp 'jre-8u20-windows-x64.tar.gz'
     $target = $CmderDir + '\jvm'
     New-Item $target -type directory -Force
-    $tarEXE = $CygwinDir + '\bin\tar.exe'
-    $tarArgs = @('-C', $target, '-xvzf', './tmp/jre-8u20-windows-x64.tar.gz', '--strip-components=1')
+    $tarEXE = $CmderDir + '\vendor\msysgit\bin\tar.exe'
+    $tarArgs = @('-C', $target, '-xzf', './tmp/jre-8u20-windows-x64.tar.gz', '--strip-components=1')
     $jvmInstallation = Start-Process -FilePath $tarEXE -ArgumentList $tarArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
     if ($jvmInstallation.ExitCode -eq 0) {
       echo $null > $jvmInstalledMarker
@@ -470,6 +470,25 @@ Function CreateSymlinks() {
   }
 }
 
+Function DownloadIcons() {
+  Write-Host
+  $iconsInstalledMarker = $Tmp + '\icons.marker'
+  if (!(Test-Path $iconsInstalledMarker)) {
+    Write-Host "Obtaining icons:"
+    $iconsDir = $CmderDir + '\icons'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/46956/download/ico' $iconsDir 'cmd.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/47749/download/ico' $iconsDir 'cygwin.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/23880/download/ico' $iconsDir 'far.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/9106/download/ico' $iconsDir 'java.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8974/download/ico' $iconsDir 'python.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8978/download/ico' $iconsDir 'ruby.ico'
+    echo $null > $iconsInstalledMarker
+    Write-Host "  icons obtained!"
+  } else {
+    Write-Host "Icons already obtained"
+  }
+}
+
 Function InstallSettings() {
   Write-Host
   $settingsInstalledMarker = $Tmp + '\settings.marker'
@@ -508,6 +527,7 @@ Function BuildLogic() {
   InstallNightCode
   InstallSublimeText
   #CreateSymlinks
+  DownloadIcons
   #TODO Install git-prompt
   InstallSettings
 

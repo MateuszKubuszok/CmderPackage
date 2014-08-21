@@ -28,10 +28,9 @@ Function EnsureFileDownloaded($source, $target) {
 
 Function ExtractZIPFile($file, $target) {
   Write-Host "  Extracting $file into $target...";
-  $shell = New-Object -com shell.application
-  $zip = $shell.NameSpace($file)
   $overrideSilent = 0x14
-  $shell.NameSpace($target).CopyHere($zip.items(), $overrideSilent)
+  $shell = New-Object -com shell.application
+  $shell.NameSpace($target).CopyHere($shell.NameSpace($file).items(), $overrideSilent)
   return 1;
 }
 
@@ -171,14 +170,15 @@ Function InstallAptCyg() {
 Function InstallDepotTools() {
   Write-Host
   $depotToolsInstalledMarker = $Tmp + '\depottools.marker'
-  $depotToolsDir = $CygwinDir + '\opt\depot_tools'
   if (!(Test-Path $depotToolsInstalledMarker)) {
     Write-Host "Obtaining depot-tools:";
+    $depotToolsDir = $CygwinDir + '\opt\depot_tools'
     $gitEXE = 'git'
     $gitArgs = @(
         'clone'
         'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
         $depotToolsDir)
+    New-Item $depotToolsDir -type directory -Force;
     $depotToolsInstallation = Start-Process -FilePath $gitEXE -ArgumentList $gitArgs -PassThru -NoNewWindow -Wait
     if ($depotToolsInstallation.ExitCode -eq 0) {
       echo $null > $depotToolsInstalledMarker
@@ -217,6 +217,29 @@ Function InstallFar() {
   }
 }
 
+Function InstallFarPlugin() {
+  Write-Host
+  $farPluginInstalledMarker = $Tmp + '\farplugin.marker'
+  if (!(Test-Path $farPluginInstalledMarker)) {
+    Write-Host "Obtaining Far Plugin:";
+    $source = $CmderDir + '\vendor\conemu-maximus5\plugins\ConEmu'
+    $target = $CmderDir + '\far\Plugins\ConEmu'
+    New-Item $target -type directory -Force;
+    $overrideSilent = 0x14
+    $shell = New-Object -com shell.application
+    $shell.NameSpace($target).CopyHere($shell.NameSpace($file).items(), $overrideSilent)
+    if (Test-Path $target) {
+      echo $null > $farPluginInstalledMarker
+      Write-Host "  Far plugin installed into $target!";
+    } else {
+      Write-Host "  Far plugin installation failed!";
+      exit 1
+    }
+  } else {
+    Write-Host "Far already extracted";
+  }
+}
+
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
   Write-Host "tmp dir: $Tmp"
@@ -227,7 +250,7 @@ Function BuildLogic() {
   InstallAptCyg;
   InstallDepotTools;
   InstallFar;
-  #TODO Install far manager plugin for conemu
+  ;InstallFarPlugin;
   #TODO Install portable JVM
   #TODO Install portable JDK ?
   #TODO Install Clojure

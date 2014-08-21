@@ -36,6 +36,18 @@ Function ExtractZIPFile($file, $target) {
   return 1
 }
 
+Function DownloadWithWgetIfNecessary($source, $targetDir, $targetName) {
+  $target = $targetDir + '\' + $targetName
+  if (!(Test-Path $target)) {
+    $wgetEXE = $CygwinDir + '\bin\wget.exe'
+    $wgetArgs = @($source, '-O', $target)
+    Write-Host "  downloading $source into $target..."
+    Start-Process -FilePath $wgetEXE -ArgumentList $wgetArgs -PassThru -NoNewWindow -Wait
+  }
+  EnsureFileDownloaded $source $target
+  return $target
+}
+
 Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
   $target = $targetDir + '\' + $targetName
   if (!(Test-Path $target)) {
@@ -338,6 +350,60 @@ Function InstallGradle() {
   }
 }
 
+Function InstallAtom() {
+  Write-Host
+  $atomInstalledMarker = $Tmp + '\atom.marker'
+  if (!(Test-Path $atomInstalledMarker)) {
+    Write-Host "Obtaining Atom:"
+    $atomURL = 'https://atom.io/download/windows'
+    $atomZIP = DownloadWithWgetIfNecessary $atomURL $Tmp 'atom-windows.zip'
+    $atomDir = $CygwinDir + '\usr\local\bin\atom'
+    if (ExtractZIPFile "$atomZIP\Atom" $atomDir) {
+      echo $null > $atomInstalledMarker
+      Write-Host "  Atom extracted into $atomDir!"
+    } else {
+      Write-Host "  Atom extraction failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "Atom already extracted"
+  }
+}
+
+Function InstallLightTable() {
+  Write-Host
+  $lightTableInstalledMarker = $Tmp + '\lighttable.marker'
+  if (!(Test-Path $lightTableInstalledMarker)) {
+    Write-Host "Obtaining LightTable:"
+    $lightTableURL = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.6.7/LightTableWin.zip'
+    $lightTableZIP = DownloadWithWgetIfNecessary $lightTableURL $Tmp 'LightTableWin.zip'
+    $lightTableDir = $CygwinDir + '\usr\local\bin'
+    if (ExtractZIPFile $lightTableZIP $lightTableDir) {
+      echo $null > $lightTableInstalledMarker
+      Write-Host "  LightTable extracted into $LightTableDir!"
+    } else {
+      Write-Host "  LightTable extraction failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "Atom already extracted"
+  }
+}
+
+Function InstallNightCode() {
+  Write-Host
+  $nightcodeInstalledMarker = $Tmp + '\nightcode.marker'
+  if (!(Test-Path $nightcodeInstalledMarker)) {
+    Write-Host "Obtaining NightCode:"
+    $leinDir = $CygwinDir + '\usr\local\bin\nightcode'
+    DownloadFileIfNecessary 'https://github.com/oakes/Nightcode/releases/download/0.3.10/nightcode-0.3.10-standalone.jar' $leinDir 'nightcode-0.3.10-standalone.jar'
+    echo $null > $nightcodeInstalledMarker
+    Write-Host "  NightCode obtained!"
+  } else {
+    Write-Host "NightCode already obtained"
+  }
+}
+
 Function InstallSettings() {
   Write-Host
   $settingsInstalledMarker = $Tmp + '\settings.marker'
@@ -371,11 +437,11 @@ Function BuildLogic() {
   InstallClojure
   InstallLeiningen
   InstallGradle
-  #TODO Install atom
-  #TODO Install lighttable
-  #TODO Install nightcore
+  InstallAtom
+  InstallLightTable
+  InstallNightCode
   #TODO Install sublime text portable
-  #TODO Create symlinks to applications
+  #TODO Create symlinks to applications (both cygwin and windows one)
   #TODO Install git-prompt
   InstallSettings
 

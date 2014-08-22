@@ -589,10 +589,6 @@ Function BuildLogic() {
   DownloadIcons
   InstallGitPrompt
   InstallSettings
-
-  #TODO Create separate script for adding depot-tools to the windows path
-  #TODO Create separate script for building and installing boost
-  #TODO Create separate script for cleaning and downloading depottools toolchain
 }
 
 # Run script

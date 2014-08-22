@@ -6,11 +6,18 @@ Builds cmder portable installation with several features preinstalled:
  * Cygwin environment,
  * apt-cyg script,
  * depot_tools,
- * Far manager,
- * Clojure REPL,
+ * portable installation of JRE and JDK,
+ * Gradle build system,
+ * Clojure REPL and Leiningen,
  * Python REPL,
  * Ruby REPL,
- * some preconfiguration files.
+ * Far manager,
+ * some preconfiguration:
+   * Cmder have Cygwin, Clojure REPL, Python REPL and Ruby REPL tasks
+     out of the box,
+   * git-prompt in Cygwin,
+   * environment variables (PATH, JAVA_PATH, etc) set dunamically on Cmder
+     startup.
 
 Enabling running scripts
 ---
@@ -55,14 +62,31 @@ Libusb
 
 File can be found on [http://sourceforge.net/projects/libusb-win32/files/latest/download](sourceforge).
 
+TODO
+---
+
+  [ ] Create separate script for adding depot-tools to the windows path.
+  [ ] Create separate script for building and installing boost.
+  [ ] Create separate script for cleaning and downloading depottools toolchain.
+
+License
+---
+
+Scripts and configs are published with Apache 2.0 license. As such anyone can
+use them and modify to their needs.
+
 Disclaimer
 ---
 
 I am not an author of any of those software. This builder merely puts together
 several software pieces and add some initial configuration to it.
 
+All credits goes to the authors of their respective product.
+
 Used software
 ---
+
+Software downloaded by script to put together a nice toolchain.
 
 ### Conemu
 
@@ -89,7 +113,30 @@ package management in a apt-get like manner.
 [http://www.chromium.org/developers/how-tos/depottools](depot_tools) - scripts
 useful when working with Google code.
 
+### Gradle
+
+[http://www.gradle.org/downloads](Gradle) - build system (mainly) for Java.
+
 ### Far manager
 
 [http://www.farmanager.com/](Far manager) - Total Commander like manager in
 a command line.
+
+### Java JRE and JDK
+
+[http://www.oracle.com/technetwork/java/javase/downloads/index.html](Java) -
+Oracle's Java platform and development kit.
+
+### Clojure
+
+[http://clojure.org/](Clojure) - Clojure programming language.
+
+[http://leiningen.org/](Leiningen) - builder for Clojure applications.
+
+### Python
+
+[https://www.python.org/](Python) - Python programming language.
+
+### Ruby
+
+[https://www.ruby-lang.org/](Ruby) - Ruby programming language.

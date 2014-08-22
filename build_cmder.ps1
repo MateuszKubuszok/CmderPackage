@@ -130,6 +130,7 @@ Function InstallCygwin() {
         '-C', 'Admin',
         # Category Archive `
         '-P', 'bzip2',
+        '-P', 'cabextract',
         '-P', 'p7zip',
         '-P', 'unzip',
         '-P', 'zip',
@@ -192,6 +193,7 @@ Function InstallCygwin() {
     Write-Host "Cygwin already installed"
   }
   $env:Path += ";$CygwinDir\bin"
+  $env:CYGWIN = 'nodosfilewarning'
 }
 
 Function InstallAptCyg() {
@@ -309,6 +311,55 @@ Function InstallPortableJVM() {
     }
   } else {
     Write-Host "Portable JVM already installed"
+  }
+}
+
+Function InstallPortableJDK() {
+  Write-Host
+  $jdkInstalledMarker = $Tmp + '\jdk.marker'
+  if (!(Test-Path $jdkInstalledMarker)) {
+    Write-Host "Obtaining portable JDK:"
+    $jdkURL = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jdk-8u20-windows-x64.exe'
+    $jdkEXE = DownloadFromOracleIfNecessary $jdkURL $Tmp 'jdk-8u20-windows-x64.exe'
+    Write-Host "  extracting JDK..."
+    $jdkDir = $CmderDir + '\jdk'
+    $cabextractEXE = $CygwinDir + '\bin\cabextract.exe'
+    $cabextractArgs = @($jdkEXE, '-d', $jdkDir, '-F', 'src.zip','-q')
+    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    if ($jdkExtract.ExitCode -ne 0) {
+      Write-Host "  JDK installation failed!"
+      exit 1
+    }
+    $cabextractArgs = @($jdkEXE, '-d', $jdkDir, '-F', 'tools.zip','-q')
+    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    if ($jdkExtract.ExitCode -ne 0) {
+      Write-Host "  JDK installation failed!"
+      exit 1
+    }
+    $unzipEXE = $CmderDir + '\vendor\msysgit\bin\unzip.exe'
+    $unzipArgs = @('-q', '-o', "$jdkDir\tools.zip")
+    $toolsExtract = Start-Process -FilePath $unzipEXE -ArgumentList $unzipArgs -PassThru -NoNewWindow -Wait -WorkingDirectory $jdkDir
+    if ($toolsExtract.ExitCode -ne 0) {
+      Write-Host "  JDK installation failed!"
+      exit 1
+    }
+    $packFiles = Get-ChildItem $jdkDir -recurse -include *.pack
+    $unpack200EXE = $jdkDir + '\bin\unpack200.exe'
+    Foreach($packFile IN $packFiles) {
+      $jarFile = $packFile -replace '\.pack$', '.jar'
+      $unpack200Args = @($packFile, $jarFile)
+      $unpack200 = Start-Process -FilePath $unpack200EXE -ArgumentList $unpack200Args -PassThru -NoNewWindow -Wait
+      if ($unpack200.ExitCode -ne 0) {
+        Write-Host "  JDK installation failed!"
+        exit 1
+      }
+      Remove-Item $packFile
+    }
+    Remove-Item "$jdkDir\tools.zip"
+    echo $null > $jdkInstalledMarker
+    Write-Host "  JDK installed into $jdkDir!"
+  } else {
+    Write-Host "Portable JDK already installed"
   }
 }
 
@@ -525,8 +576,8 @@ Function BuildLogic() {
   InstallDepotTools
   InstallFar
   InstallFarPlugin
-  InstallPortableJVM;
-  #TODO Install portable JDK ?
+  InstallPortableJVM
+  InstallPortableJDK
   InstallClojure
   InstallLeiningen
   InstallGradle

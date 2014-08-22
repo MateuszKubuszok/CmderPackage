@@ -65,9 +65,10 @@ File can be found on [http://sourceforge.net/projects/libusb-win32/files/latest/
 TODO
 ---
 
-  [ ] Create separate script for adding depot-tools to the windows path.
-  [ ] Create separate script for building and installing boost.
-  [ ] Create separate script for cleaning and downloading depottools toolchain.
+  - [ ] Create separate script for adding depot-tools to the windows path.
+  - [ ] Create separate script for building and installing boost.
+  - [ ] Create separate script for cleaning and downloading depottools
+        Windows toolchain.
 
 License
 ---

@@ -51,24 +51,30 @@ PowerShell (or from x64 to x86).
 Cygwin setup
 ---
 
-Cygwin can be further configured by running:
+Once Cygwin is installed it can be further configured by running:
 
     .\setup_cygwin.ps1
 
 and choosing packages to install/remove.
 
+Boost and depottools
+---
+
+To install boost run:
+
+    /opt/install_boost.sh
+
+in Cygwin console. Depot tools can be similarly (re)installed with command:
+
+    /opt/reinstall_depot_tools.sh
+
+Depottools directory can then be added to PATH with `seet_PATH_depottools.ps1`
+(run with administrator's priviledges).
+
 Libusb
 ---
 
 File can be found on [http://sourceforge.net/projects/libusb-win32/files/latest/download](sourceforge).
-
-TODO
----
-
-  - [ ] Create separate script for adding depot-tools to the windows path.
-  - [ ] Create separate script for building and installing boost.
-  - [ ] Create separate script for cleaning and downloading depottools
-        Windows toolchain.
 
 License
 ---

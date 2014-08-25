@@ -1,22 +1,26 @@
 cmder package builder
 ===
 
-Builds cmder portable installation with several features preinstalled:
+Builds [cmder](http://bliker.github.io/cmder/) portable installation with
+several features preinstalled:
 
- * Cygwin environment,
- * apt-cyg script,
- * depot_tools,
- * portable installation of JRE and JDK,
- * Gradle build system,
- * Clojure REPL and Leiningen,
- * Python REPL,
- * Ruby REPL,
- * Far manager,
+ * [Cygwin](https://cygwin.com/) environment,
+ * [apt-cyg](https://code.google.com/p/apt-cyg/) script,
+ * [depot_tools](http://www.chromium.org/developers/how-tos/depottools),
+ * portable installation of [JRE and JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html),
+ * [Gradle](http://www.gradle.org/downloads) build system,
+ * [Clojure](http://clojure.org/) REPL and [Leiningen](http://leiningen.org/)
+   builder,
+ * [Python](https://www.python.org/) REPL,
+ * [Ruby](https://www.ruby-lang.org/) REPL,
+ * [Far](http://www.farmanager.com/) manager,
  * some preconfiguration:
-   * Cmder have Cygwin, Clojure REPL, Python REPL and Ruby REPL tasks
+   * Cmder have Cygwin, Clojure REPL, Python REPL and Ruby REPL
+     [tasks](https://code.google.com/p/conemu-maximus5/wiki/SettingsTasks)
      out of the box,
-   * git-prompt in Cygwin,
-   * environment variables (PATH, JAVA_PATH, etc) set dunamically on Cmder
+   * [git-prompt](https://github.com/git/git/blob/master/contrib/completion/git-prompt.sh)
+     in Cygwin,
+   * environment variables (PATH, JAVA_PATH, etc) set dynamically on Cmder
      startup.
 
 Enabling running scripts
@@ -74,7 +78,7 @@ Depottools directory can then be added to PATH with `seet_PATH_depottools.ps1`
 Libusb
 ---
 
-File can be found on [http://sourceforge.net/projects/libusb-win32/files/latest/download](sourceforge).
+File can be found on [sourceforge](http://sourceforge.net/projects/libusb-win32/files/latest/download).
 
 License
 ---
@@ -97,53 +101,45 @@ Software downloaded by script to put together a nice toolchain.
 
 ### Conemu
 
-[https://code.google.com/p/conemu-maximus5/](Conemu) - contains original Conemu
+[Conemu](https://code.google.com/p/conemu-maximus5/) - contains original Conemu
 software without any additional addons.
 
-### Cmder
-
-[http://bliker.github.io/cmder/](Cmder) - portable installation of
+[Cmder](http://bliker.github.io/cmder/) - portable installation of
 Conemu with preinstalled enhancements for CMD console.
+
+[Far manager](http://www.farmanager.com/) - Total Commander like manager in
+a command line.
 
 ### Cygwin
 
-[https://cygwin.com/](Cygwin) - POSIX environment for Windows system. Contains
+[Cygwin](https://cygwin.com/) - POSIX environment for Windows system. Contains
 many ported packages.
 
-### apt-cyg
-
-[https://code.google.com/p/apt-cyg/](apt-cyg) - script for Cygwin allowing
+[apt-cyg](https://code.google.com/p/apt-cyg/) - script for Cygwin allowing
 package management in a apt-get like manner.
 
 ### depot_tools
 
-[http://www.chromium.org/developers/how-tos/depottools](depot_tools) - scripts
+[depot_tools](http://www.chromium.org/developers/how-tos/depottools) - scripts
 useful when working with Google code.
-
-### Gradle
-
-[http://www.gradle.org/downloads](Gradle) - build system (mainly) for Java.
-
-### Far manager
-
-[http://www.farmanager.com/](Far manager) - Total Commander like manager in
-a command line.
 
 ### Java JRE and JDK
 
-[http://www.oracle.com/technetwork/java/javase/downloads/index.html](Java) -
+[Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) -
 Oracle's Java platform and development kit.
+
+[Gradle](http://www.gradle.org/downloads) - build system (mainly) for Java.
 
 ### Clojure
 
-[http://clojure.org/](Clojure) - Clojure programming language.
+[Clojure](http://clojure.org/) - Clojure programming language.
 
-[http://leiningen.org/](Leiningen) - builder for Clojure applications.
+[Leiningen](http://leiningen.org/) - builder for Clojure applications.
 
 ### Python
 
-[https://www.python.org/](Python) - Python programming language.
+[Python](https://www.python.org/) - Python programming language.
 
 ### Ruby
 
-[https://www.ruby-lang.org/](Ruby) - Ruby programming language.
+[Ruby](https://www.ruby-lang.org/) - Ruby programming language.

@@ -1,10 +1,79 @@
 Import-Module BitsTransfer
 
+# Paths
+################################################################################
+
+$CurrentDir = split-path -parent $MyInvocation.MyCommand.Definition
+$Tmp        = "$CurrentDir\tmp"
+$CmderDir   = "$CurrentDir\cmder"
+$CygwinDir  = "$CmderDir\cygwin"
+$MsysgitDir = "$CmderDir\vendor\msysgit"
+
+$7zaEXE        = "$CygwinDir\lib\p7zip\7za.exe"
+$cabextractEXE = "$CygwinDir\bin\cabextract.exe"
+$gitEXE        = "$MsysgitDir\bin\git"
+$lnEXE         = "$MsysgitDir\bin\ln"
+$tarEXE        = "$MsysgitDir\bin\tar.exe"
+$unzipEXE      = "$MsysgitDir\bin\unzip.exe"
+$wgetEXE       = "$CygwinDir\bin\wget.exe"
+
+# Variables
+################################################################################
+
+$cmderURL       = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip'
+$cmderTmp       = 'cmder-v1.1.3.zip'
+$cmderMrk       = 'cmder-v1.1.3'
+$cygwinURL      = 'https://cygwin.com/setup-x86_64.exe'
+$cygwinTmp      = 'setup-x86_64.exe'
+$cygwinMrk      = 'cygwin'
+$aptCygURL      = 'https://apt-cyg.googlecode.com/svn/trunk/apt-cyg'
+$aptCygMrk      = 'aptcyg'
+$depotToolsURL  = 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
+$depotToolsMrk  = 'depottools'
+$farURL         = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z'
+$farTmp         = 'Far30b4040.x64.20140810.7z'
+$farMrk         = 'far30b4040.x64.20140810'
+$farPluginMrk   = "farplugin-$farMrk-$cmderMrk"
+$jvmURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-windows-x64.tar.gz'
+$jvmTmp         = 'jre-8u20-windows-x64.tar.gz'
+$jvmMrk         = 'jre-8u20'
+$jdkURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jdk-8u20-windows-x64.exe'
+$jdkTmp         = 'jdk-8u20-windows-x64.exe'
+$jdkMrk         = 'jdk-8u20'
+$clojureURL     = 'http://central.maven.org/maven2/org/clojure/clojure/1.6.0/clojure-1.6.0.zip'
+$clojureTmp     = 'clojure-1.6.0.zip'
+$clojureMrk     = 'clojure-1.6.0'
+$leiningenURL   = 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein'
+$leiningenMrk   = 'leiningen'
+$gradleURL      = 'https://services.gradle.org/distributions/gradle-1.11-all.zip'
+$gradleTmp      = 'gradle-1.11-all.zip'
+$gradleMrk      = 'gradle-1.11'
+$atomURL        = 'https://atom.io/download/windows'
+$atomTmp        = 'atom-windows.zip'
+$atomMrk        = 'atom'
+$lightTableURL  = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.6.7/LightTableWin.zip'
+$lightTableTmp  = 'LightTableWin-0.6.7.zip'
+$lightTableMrk  = 'lighttable-0.6.7'
+$nightCoreURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.10/nightcode-0.3.10-standalone.jar'
+$nightCodeTmp   = 'nightcode-0.3.10-standalone.jar'
+$nightCodeMrk   = 'nightcode-0.3.10'
+$sublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3059 x64.zip"'
+$sublimeTextURL = 'Sublime Text Build 3059 x64.zip'
+$sublimeTextMrk = 'sublime-text-3059'
+$gitPromptMrk   = 'gitprompt'
+$symlinksMrk    = 'symlinks'
+$iconsMrk       = 'icons'
+$settingsMrk    = 'settings'
+
 # Helper functions
 ################################################################################
 
+Function MarkerName($name) {
+  return "$Tmp\$name.marker"
+}
+
 Function DownloadFileIfNecessary($source, $targetDir, $targetName) {
-  $target = $targetDir + '\' + $targetName
+  $target = "$targetDir\$targetName"
   if (!(Test-Path $target)) {
     $webclient = New-Object System.Net.WebClient
     if (!(Test-Path $targetDir)) {
@@ -19,27 +88,26 @@ Function DownloadFileIfNecessary($source, $targetDir, $targetName) {
 
 Function EnsureFileDownloaded($source, $target) {
   if (!(Test-Path $target)) {
-    Write-Host "  failed to download $source"
+    Write-Host "  failed to download $source!"
     exit 1
   } else {
     Write-Host "  $source downloaded successfully"
   }
 }
 
-Function ExtractZIPFile($file, $target) {
+Function CopyDirContent($file, $target) {
   Write-Host "  Extracting $file into $target..."
   New-Item $target -type directory -Force
   $overrideSilent = 0x14
   $shell = New-Object -com shell.application
-  $zip = $shell.NameSpace($file)
-  $shell.NameSpace($target).CopyHere($zip.items(), $overrideSilent)
+  $content = $shell.NameSpace($file)
+  $shell.NameSpace($target).CopyHere($content.items(), $overrideSilent)
   return 1
 }
 
 Function DownloadWithWgetIfNecessary($source, $targetDir, $targetName) {
-  $target = $targetDir + '\' + $targetName
+  $target = "$targetDir\$targetName"
   if (!(Test-Path $target)) {
-    $wgetEXE = $CygwinDir + '\bin\wget.exe'
     $wgetArgs = @($source, '-O', $target)
     Write-Host "  downloading $source into $target..."
     Start-Process -FilePath $wgetEXE -ArgumentList $wgetArgs -PassThru -NoNewWindow -Wait
@@ -51,7 +119,6 @@ Function DownloadWithWgetIfNecessary($source, $targetDir, $targetName) {
 Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
   $target = $targetDir + '\' + $targetName
   if (!(Test-Path $target)) {
-    $wgetEXE = $CygwinDir + '\bin\wget.exe'
     $wgetArgs = @(
         '--no-check-certificate', '--no-cookies',
         '--header', '"Cookie: oraclelicense=accept-securebackup-cookie"',
@@ -66,9 +133,8 @@ Function DownloadFromOracleIfNecessary($source, $targetDir, $targetName) {
 
 Function CreateCygwinSymlink($from, $to) {
   if (!(Test-Path $from)) {
-    $cmd = $CmderDir + '\vendor\msysgit\bin\ln'
-    $args = @('-s', $to, $from)
-    Start-Process -FilePath $cmd -ArgumentList $args -PassThru -NoNewWindow -Wait
+    $lnArgs = @('-s', $to, $from)
+    Start-Process -FilePath $lnEXE -ArgumentList $lnArgs -PassThru -NoNewWindow -Wait
   }
   EnsureSymlinkCreated $from $to
 }
@@ -85,23 +151,17 @@ Function EnsureSymlinkCreated($from, $to) {
 # Build logic
 ################################################################################
 
-$CurrentDir = split-path -parent $MyInvocation.MyCommand.Definition
-$Tmp = $CurrentDir + '\tmp'
-$CmderDir = $CurrentDir + '\cmder'
-$CygwinDir = $CmderDir + '\cygwin'
-
 Function InstallCmder() {
   Write-Host
-  $cmderInstalledMarker = $Tmp + '\cmder.marker'
+  $cmderInstalledMarker = MarkerName($cmderMrk)
   if (!(Test-Path $cmderInstalledMarker)) {
-    Write-Host "Obtaining Cmder:"
-    $cmderURL = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip'
-    $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp 'cmder.zip'
-    if (ExtractZIPFile $cmderZIP $CurrentDir) {
+    Write-Host 'Obtaining Cmder:'
+    $cmderZIP = DownloadFileIfNecessary $cmderURL $Tmp $cmderTmp
+    if (CopyDirContent $cmderZIP $CurrentDir) {
       echo $null > $cmderInstalledMarker
       Write-Host "  Cmder extracted into $CmderDir!"
     } else {
-      Write-Host "  Cmder extraction failed!"
+      Write-Host '  Cmder extraction failed!'
       exit 1
     }
   } else {
@@ -111,11 +171,10 @@ Function InstallCmder() {
 
 Function InstallCygwin() {
   Write-Host
-  $cygwinInstalledMarker = $Tmp + '\cygwin.marker'
+  $cygwinInstalledMarker = MarkerName($cygwinMrk)
   if (!(Test-Path $cygwinInstalledMarker)) {
-    Write-Host "Obtaining Cygwin:"
-    $cygwinURL = 'https://cygwin.com/setup-x86_64.exe'
-    $cygwinEXE = DownloadFileIfNecessary $cygwinURL $Tmp 'setup-x86_64.exe'
+    Write-Host 'Obtaining Cygwin:'
+    $cygwinEXE = DownloadFileIfNecessary $cygwinURL $Tmp $cygwinTmp
     $cygwinArgs = @(
         '--no-admin', '--upgrade-also', '--quiet-mode',
         '--no-desktop', '--no-startmenu', '--no-shortcuts',
@@ -190,7 +249,7 @@ Function InstallCygwin() {
       exit $cygwinInstallation.ExitCode
     }
   } else {
-    Write-Host "Cygwin already installed"
+    Write-Host 'Cygwin already installed'
   }
   $env:Path += ";$CygwinDir\bin"
   $env:CYGWIN = 'nodosfilewarning'
@@ -198,12 +257,11 @@ Function InstallCygwin() {
 
 Function InstallAptCyg() {
   Write-Host
-  $aptCygInstalledMarker = $Tmp + '\aptcyg.marker'
+  $aptCygInstalledMarker = MarkerName($aptcygMrk)
   if (!(Test-Path $aptCygInstalledMarker)) {
-    Write-Host "Obtaining apt-cyg:"
-    $aptCygURL = "https://apt-cyg.googlecode.com/svn/trunk/apt-cyg"
-    $aptCygDir = $cygwinDir + '\bin'
-    $aptCygFile = DownloadFileIfNecessary $aptCygURL $aptCygDir 'apt-cyg'
+    Write-Host 'Obtaining apt-cyg:'
+    $aptCygDir = "$cygwinDir\bin"
+    $aptCygFile = DownloadFileIfNecessary $aptCygURL $aptCygDir $aptCygTmp
     if (Test-Path $aptCygFile) {
       echo $null > $aptCygInstalledMarker
       Write-Host "  apt-cyg installed into $aptCygDir!"
@@ -212,21 +270,17 @@ Function InstallAptCyg() {
       exit 1
     }
   } else {
-    Write-Host "apt-cyg already installed"
+    Write-Host 'apt-cyg already installed'
   }
 }
 
 Function InstallDepotTools() {
   Write-Host
-  $depotToolsInstalledMarker = $Tmp + '\depottools.marker'
+  $depotToolsInstalledMarker = MarkerName($depotToolsMrk)
   if (!(Test-Path $depotToolsInstalledMarker)) {
-    Write-Host "Obtaining depot-tools:"
-    $depotToolsDir = $CygwinDir + '\opt\depot_tools'
-    $gitEXE = 'git'
-    $gitArgs = @(
-        'clone'
-        'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
-        $depotToolsDir)
+    Write-Host 'Obtaining depot-tools:'
+    $depotToolsDir = "$CygwinDir\opt\depot_tools"
+    $gitArgs = @('clone', $depotToolsURL, $depotToolsDir)
     New-Item $depotToolsDir -type directory -Force
     $depotToolsInstallation = Start-Process -FilePath $gitEXE -ArgumentList $gitArgs -PassThru -NoNewWindow -Wait
     if ($depotToolsInstallation.ExitCode -eq 0) {
@@ -237,20 +291,18 @@ Function InstallDepotTools() {
       exit 1
     }
   } else {
-    Write-Host "depottools already installed"
+    Write-Host 'depottools already installed'
   }
 }
 
 Function InstallFar() {
   Write-Host
-  $farInstalledMarker = $Tmp + '\far.marker'
+  $farInstalledMarker = MarkerName($farMrk)
   if (!(Test-Path $farInstalledMarker)) {
-    Write-Host "Obtaining Far:"
-    $farURL = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z'
-    DownloadFileIfNecessary $farURL $Tmp 'Far30b4040.x64.20140810.7z'
-    $far7Z = 'tmp/Far30b4040.x64.20140810.7z'
+    Write-Host 'Obtaining Far:'
+    DownloadFileIfNecessary $farURL $Tmp $farTmp
+    $far7Z  = "tmp/$farTmp"
     $farDir = 'cmder/far'
-    $7zaEXE = $CygwinDir + '\lib\p7zip\7za.exe'
     $7zaArgs = @('x', $far7Z, "-o$farDir", '-y')
     New-Item $farDir -type directory -Force
     $farInstallation = Start-Process -FilePath $7zaEXE -ArgumentList $7zaArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
@@ -268,39 +320,33 @@ Function InstallFar() {
 
 Function InstallFarPlugin() {
   Write-Host
-  $farPluginInstalledMarker = $Tmp + '\farplugin.marker'
+  $farPluginInstalledMarker = MarkerName($farPluginMrk)
   if (!(Test-Path $farPluginInstalledMarker)) {
-    Write-Host "Obtaining Far plugin for Conemu integration:"
-    $source = $CmderDir + '\vendor\conemu-maximus5\plugins\ConEmu'
-    $target = $CmderDir + '\far\Plugins\ConEmu'
-    New-Item $target -type directory -Force
-    $overrideSilent = 0x14
-    $shell = New-Object -com shell.application
-    $directory = $shell.NameSpace($source)
-    $shell.NameSpace($target).CopyHere($directory.items(), $overrideSilent)
+    Write-Host 'Obtaining Far plugin for Conemu integration:'
+    $source = "$CmderDir\vendor\conemu-maximus5\plugins\ConEmu"
+    $target = "$CmderDir\far\Plugins\ConEmu"
+    CopyDirContent $source $target
     if (Test-Path $target) {
       echo $null > $farPluginInstalledMarker
       Write-Host "  Far plugin installed into $target!"
     } else {
-      Write-Host "  Far plugin installation failed!"
+      Write-Host '  Far plugin installation failed!'
       exit 1
     }
   } else {
-    Write-Host "Far plugin already installed"
+    Write-Host 'Far plugin already installed'
   }
 }
 
 Function InstallPortableJVM() {
   Write-Host
-  $jvmInstalledMarker = $Tmp + '\jvm.marker'
+  $jvmInstalledMarker = MarkerName($jvmMrk)
   if (!(Test-Path $jvmInstalledMarker)) {
-    Write-Host "Obtaining portable JVM:"
-    $jvmURL = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-windows-x64.tar.gz'
-    DownloadFromOracleIfNecessary $jvmURL $Tmp 'jre-8u20-windows-x64.tar.gz'
-    $target = $CmderDir + '\jvm'
+    Write-Host 'Obtaining portable JVM:'
+    DownloadFromOracleIfNecessary $jvmURL $Tmp $jvmTmp
+    $target = "$CmderDir\jvm"
     New-Item $target -type directory -Force
-    $tarEXE = $CmderDir + '\vendor\msysgit\bin\tar.exe'
-    $tarArgs = @('-C', $target, '-xzf', './tmp/jre-8u20-windows-x64.tar.gz', '--strip-components=1')
+    $tarArgs = @('-C', "$target", '-xzf', "./tmp/$jvmTmp", '--strip-components=1')
     $jvmInstallation = Start-Process -FilePath $tarEXE -ArgumentList $tarArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
     if ($jvmInstallation.ExitCode -eq 0) {
       echo $null > $jvmInstalledMarker
@@ -316,41 +362,41 @@ Function InstallPortableJVM() {
 
 Function InstallPortableJDK() {
   Write-Host
-  $jdkInstalledMarker = $Tmp + '\jdk.marker'
+  $jdkInstalledMarker = MarkerName($jdkMrk)
   if (!(Test-Path $jdkInstalledMarker)) {
-    Write-Host "Obtaining portable JDK:"
-    $jdkURL = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jdk-8u20-windows-x64.exe'
-    $jdkEXE = DownloadFromOracleIfNecessary $jdkURL $Tmp 'jdk-8u20-windows-x64.exe'
-    Write-Host "  extracting JDK..."
-    $jdkDir = $CmderDir + '\jdk'
-    $cabextractEXE = $CygwinDir + '\bin\cabextract.exe'
-    $cabextractArgs = @($jdkEXE, '-d', $jdkDir, '-F', 'src.zip','-q')
-    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    Write-Host 'Obtaining portable JDK:'
+    $jdkEXE = DownloadFromOracleIfNecessary $jdkURL $Tmp $jdkTmp
+    Write-Host '  extracting src.zip...'
+    $jdkDir = "$CmderDir\jdk"
+    $cabextractArgs = @("$jdkEXE", '-d', "$jdkDir", '-F', 'src.zip', '-q')
+    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait
     if ($jdkExtract.ExitCode -ne 0) {
-      Write-Host "  JDK installation failed!"
+      Write-Host '  JDK installation failed!'
       exit 1
     }
-    $cabextractArgs = @($jdkEXE, '-d', $jdkDir, '-F', 'tools.zip','-q')
-    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    Write-Host '  extracting tools.zip...'
+    $cabextractArgs = @("$jdkEXE", '-d', "$jdkDir", '-F', 'tools.zip', '-q')
+    $jdkExtract = Start-Process -FilePath $cabextractEXE -ArgumentList $cabextractArgs -PassThru -NoNewWindow -Wait
     if ($jdkExtract.ExitCode -ne 0) {
-      Write-Host "  JDK installation failed!"
+      Write-Host '  JDK installation failed!'
       exit 1
     }
-    $unzipEXE = $CmderDir + '\vendor\msysgit\bin\unzip.exe'
+    Write-Host '  extracting unziping tools.zip...'
     $unzipArgs = @('-q', '-o', "$jdkDir\tools.zip")
     $toolsExtract = Start-Process -FilePath $unzipEXE -ArgumentList $unzipArgs -PassThru -NoNewWindow -Wait -WorkingDirectory $jdkDir
     if ($toolsExtract.ExitCode -ne 0) {
-      Write-Host "  JDK installation failed!"
+      Write-Host '  JDK installation failed!'
       exit 1
     }
+    Write-Host '  extracting .pack to .jar...'
     $packFiles = Get-ChildItem $jdkDir -recurse -include *.pack
-    $unpack200EXE = $jdkDir + '\bin\unpack200.exe'
+    $unpack200EXE = "$jdkDir\bin\unpack200.exe"
     Foreach($packFile IN $packFiles) {
       $jarFile = $packFile -replace '\.pack$', '.jar'
       $unpack200Args = @($packFile, $jarFile)
       $unpack200 = Start-Process -FilePath $unpack200EXE -ArgumentList $unpack200Args -PassThru -NoNewWindow -Wait
       if ($unpack200.ExitCode -ne 0) {
-        Write-Host "  JDK installation failed!"
+        Write-Host '  JDK installation failed!'
         exit 1
       }
       Remove-Item $packFile
@@ -359,216 +405,209 @@ Function InstallPortableJDK() {
     echo $null > $jdkInstalledMarker
     Write-Host "  JDK installed into $jdkDir!"
   } else {
-    Write-Host "Portable JDK already installed"
+    Write-Host 'Portable JDK already installed'
   }
 }
 
 Function InstallClojure() {
   Write-Host
-  $clojureInstalledMarker = $Tmp + '\clojure.marker'
+  $clojureInstalledMarker = MarkerName($clojureMrk)
   if (!(Test-Path $clojureInstalledMarker)) {
-    Write-Host "Obtaining Clojure:"
-    $clojureURL = 'http://central.maven.org/maven2/org/clojure/clojure/1.6.0/clojure-1.6.0.zip'
-    $clojureZIP = DownloadFileIfNecessary $clojureURL $Tmp 'clojure-1.6.0.zip'
-    $clojureDir = $CmderDir + '\clojure'
-    if (ExtractZIPFile ($clojureZIP + '\clojure-1.6.0') $clojureDir) {
+    Write-Host 'Obtaining Clojure:'
+    $clojureZIP = DownloadFileIfNecessary $clojureURL $Tmp $clojureTmp
+    $clojureDir = "$CmderDir\clojure"
+    if (CopyDirContent "$clojureZIP\$clojureMrk" $clojureDir) {
       echo $null > $clojureInstalledMarker
       Write-Host "  Clojure extracted into $clojureDir!"
     } else {
-      Write-Host "  Clojure extraction failed!"
+      Write-Host '  Clojure extraction failed!'
       exit 1
     }
   } else {
-    Write-Host "Clojure already extracted"
+    Write-Host 'Clojure already extracted'
   }
 }
 
 Function InstallLeiningen() {
   Write-Host
-  $leiningenInstalledMarker = $Tmp + '\leiningen.marker'
+  $leiningenInstalledMarker = MarkerName($leiningenMrk)
   if (!(Test-Path $leiningenInstalledMarker)) {
-    Write-Host "Obtaining Leiningen:"
-    $leinDir = $CygwinDir + '\bin'
-    $leinBarDir = $CmderDir + '\bin'
-    DownloadFileIfNecessary 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein' $leinDir 'lein'
-    DownloadFileIfNecessary 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat' $leinBarDir 'lein.bat'
+    Write-Host 'Obtaining Leiningen:'
+    $leinDir    = "$CygwinDir\bin"
+    $leinBatDir = "$CmderDir\bin"
+    DownloadFileIfNecessary $leiningenURL       $leinDir    'lein'
+    DownloadFileIfNecessary "$leiningenURL.bat" $leinBatDir 'lein.bat'
     echo $null > $leiningenInstalledMarker
-    Write-Host "  Leiningen obtained!"
+    Write-Host '  Leiningen obtained!'
   } else {
-    Write-Host "Leiningen already obtained"
+    Write-Host 'Leiningen already obtained'
   }
 }
 
 Function InstallGradle() {
   Write-Host
-  $gradleInstalledMarker = $Tmp + '\gradle.marker'
+  $gradleInstalledMarker = MarkerName($gradleMrk)
   if (!(Test-Path $gradleInstalledMarker)) {
-    Write-Host "Obtaining Gradle:"
-    $gradleURL = 'https://services.gradle.org/distributions/gradle-1.11-all.zip'
-    $gradleZIP = DownloadFileIfNecessary $gradleURL $Tmp 'gradle-1.11-all.zip'
-    $gradleDir = $CmderDir + '\tools'
-    if (ExtractZIPFile $gradleZIP $gradleDir) {
+    Write-Host 'Obtaining Gradle:'
+    $gradleZIP = DownloadFileIfNecessary $gradleURL $Tmp $gradleTmp
+    $gradleDir = "$CmderDir\tools"
+    if (CopyDirContent $gradleZIP $gradleDir) {
       echo $null > $gradleInstalledMarker
       Write-Host "  Gradle extracted into $gradleDir!"
     } else {
-      Write-Host "  Gradle extraction failed!"
+      Write-Host '  Gradle extraction failed!'
       exit 1
     }
   } else {
-    Write-Host "Gradle already extracted"
+    Write-Host 'Gradle already extracted'
   }
 }
 
 Function InstallAtom() {
   Write-Host
-  $atomInstalledMarker = $Tmp + '\atom.marker'
+  $atomInstalledMarker = MarkerName($atomMrk)
   if (!(Test-Path $atomInstalledMarker)) {
-    Write-Host "Obtaining Atom:"
-    $atomURL = 'https://atom.io/download/windows'
-    $atomZIP = DownloadWithWgetIfNecessary $atomURL $Tmp 'atom-windows.zip'
-    $atomDir = $CygwinDir + '\usr\local\bin\atom'
-    if (ExtractZIPFile "$atomZIP\Atom" $atomDir) {
+    Write-Host 'Obtaining Atom:'
+    $atomZIP = DownloadWithWgetIfNecessary $atomURL $Tmp $atomTmp
+    $atomDir = "$CygwinDir\usr\local\bin\atom"
+    if (CopyDirContent "$atomZIP\Atom" $atomDir) {
       echo $null > $atomInstalledMarker
       Write-Host "  Atom extracted into $atomDir!"
     } else {
-      Write-Host "  Atom extraction failed!"
+      Write-Host '  Atom extraction failed!'
       exit 1
     }
   } else {
-    Write-Host "Atom already extracted"
+    Write-Host 'Atom already extracted'
   }
 }
 
 Function InstallLightTable() {
   Write-Host
-  $lightTableInstalledMarker = $Tmp + '\lighttable.marker'
+  $lightTableInstalledMarker = MarkerName($lightTableMrk)
   if (!(Test-Path $lightTableInstalledMarker)) {
-    Write-Host "Obtaining LightTable:"
-    $lightTableURL = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.6.7/LightTableWin.zip'
-    $lightTableZIP = DownloadWithWgetIfNecessary $lightTableURL $Tmp 'LightTableWin.zip'
-    $lightTableDir = $CygwinDir + '\usr\local\bin'
-    if (ExtractZIPFile $lightTableZIP $lightTableDir) {
+    Write-Host 'Obtaining LightTable:'
+    $lightTableZIP = DownloadWithWgetIfNecessary $lightTableURL $Tmp $lightTableTmp
+    $lightTableDir = "$CygwinDir\usr\local\bin\LightTable"
+    if (CopyDirContent "$lightTableZIP\LightTable" $lightTableDir) {
       echo $null > $lightTableInstalledMarker
       Write-Host "  LightTable extracted into $LightTableDir!"
     } else {
-      Write-Host "  LightTable extraction failed!"
+      Write-Host '  LightTable extraction failed!'
       exit 1
     }
   } else {
-    Write-Host "Atom already extracted"
+    Write-Host 'LightTable already extracted'
   }
 }
 
 Function InstallNightCode() {
   Write-Host
-  $nightcodeInstalledMarker = $Tmp + '\nightcode.marker'
+  $nightcodeInstalledMarker = MarkerName($nightCodeMrk)
   if (!(Test-Path $nightcodeInstalledMarker)) {
-    Write-Host "Obtaining NightCode:"
-    $leinDir = $CygwinDir + '\usr\local\bin\nightcode'
-    DownloadFileIfNecessary 'https://github.com/oakes/Nightcode/releases/download/0.3.10/nightcode-0.3.10-standalone.jar' $leinDir 'nightcode-0.3.10-standalone.jar'
+    Write-Host 'Obtaining NightCode:'
+    $nightcodeDir = "$CygwinDir\usr\local\bin\nightcode"
+    DownloadFileIfNecessary $nightCoreURL $nightcodeDir $nightCodeTmp
     echo $null > $nightcodeInstalledMarker
-    Write-Host "  NightCode obtained!"
+    Write-Host '  NightCode obtained!'
   } else {
-    Write-Host "NightCode already obtained"
+    Write-Host 'NightCode already obtained'
   }
 }
 
 Function InstallSublimeText() {
   Write-Host
-  $sublimeTextInstalledMarker = $Tmp + '\sublimetext.marker'
+  $sublimeTextInstalledMarker = MarkerName($sublimeTextMrk)
   if (!(Test-Path $sublimeTextInstalledMarker)) {
-    Write-Host "Obtaining Sublime Text 3:"
-    $sublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3059 x64.zip"'
-    $sublimeTextZIP = DownloadWithWgetIfNecessary $sublimeTextURL $Tmp 'SublimeText3.zip'
-    $sublimeTextDir = $CygwinDir + '\usr\local\bin\sublime-text'
-    New-Item $sublimeTextDir -type directory -Force
-    $overrideSilent = 0x14
-    $shell = New-Object -com shell.application
-    $zip = $shell.NameSpace($sublimeTextZIP)
-    $shell.NameSpace($sublimeTextDir).CopyHere($zip.items(), $overrideSilent)
-    echo $null > $sublimeTextInstalledMarker
-    Write-Host "  Sublime Text 3 extracted into $sublimeTextDir!"
+    Write-Host 'Obtaining Sublime Text 3:'
+    $sublimeTextZIP = DownloadWithWgetIfNecessary $sublimeTextURL $Tmp $sublimeTextTmp
+    $sublimeTextDir = "$CygwinDir\usr\local\bin\sublime-text"
+    if (CopyDirContent $sublimeTextZIP $sublimeTextDir) {
+      echo $null > $sublimeTextInstalledMarker
+      Write-Host "  Sublime Text 3 extracted into $sublimeTextDir!"
+    } else {
+      Write-Host '  LightTable extraction failed!'
+      exit 1
+    }
   } else {
-    Write-Host "Sublime Text 3 already extracted"
+    Write-Host 'Sublime Text 3 already extracted'
   }
 }
 
 Function InstallGitPrompt() {
   Write-Host
-  $gitPromptInstalledMarker = $Tmp + '\gitprompt.marker'
+  $gitPromptInstalledMarker = MarkerName($gitPromptMrk)
   if (!(Test-Path $gitPromptInstalledMarker)) {
-    Write-Host "Obtaining git-prompt.sh:"
-    $source = $CmderDir + '\vendor\msysgit\etc\git-prompt.sh'
-    $target = $CygwinDir + '\etc'
+    Write-Host 'Obtaining git-prompt.sh:'
+    $source = "$MsysgitDir\etc\git-prompt.sh"
+    $target = "$CygwinDir\etc"
     Copy-Item $source $target
     if (Test-Path $target) {
       echo $null > $gitPromptInstalledMarker
       Write-Host "  git-prompt.sh installed into $target!"
     } else {
-      Write-Host "  git-prompt.sh installation failed!"
+      Write-Host '  git-prompt.sh installation failed!'
       exit 1
     }
   } else {
-    Write-Host "git-prompt.sh already installed"
+    Write-Host 'git-prompt.sh already installed'
   }
 }
 
 Function CreateSymlinks() {
   Write-Host
-  $symlinkCreatedMarker = $Tmp + '\symlinks.marker'
+  $symlinkCreatedMarker = MarkerName($symlinksMrk)
   if (!(Test-Path $symlinkCreatedMarker)) {
-    Write-Host "Creating symlinks:"
-    CreateCygwinSymlink "$CygwinDir\bin\atom.exe" "$CygwinDir\usr\local\bin\atom\atom.exe"
-    CreateCygwinSymlink "$CygwinDir\bin\light-table.exe" "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
-    CreateCygwinSymlink "$CygwinDir\bin\nightcode.jar" "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
+    Write-Host 'Creating symlinks:'
+    CreateCygwinSymlink "$CygwinDir\bin\atom.exe"         "$CygwinDir\usr\local\bin\atom\atom.exe"
+    CreateCygwinSymlink "$CygwinDir\bin\light-table.exe"  "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
+    CreateCygwinSymlink "$CygwinDir\bin\nightcode.jar"    "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
     CreateCygwinSymlink "$CygwinDir\bin\sublime_text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime_text.exe"
     echo $null > $symlinkCreatedMarker
-    Write-Host "  symlinks created!"
+    Write-Host '  symlinks created!'
   } else {
-    Write-Host "Symlinks already created"
+    Write-Host 'Symlinks already created'
   }
 }
 
 Function DownloadIcons() {
   Write-Host
-  $iconsInstalledMarker = $Tmp + '\icons.marker'
+  $iconsInstalledMarker = MarkerName($iconsMrk)
   if (!(Test-Path $iconsInstalledMarker)) {
-    Write-Host "Obtaining icons:"
-    $iconsDir = $CmderDir + '\icons'
+    Write-Host 'Obtaining icons:'
+    $iconsDir = "$CmderDir\icons"
     DownloadFileIfNecessary 'https://www.iconfinder.com/icons/46956/download/ico' $iconsDir 'cmd.ico'
     DownloadFileIfNecessary 'https://www.iconfinder.com/icons/47749/download/ico' $iconsDir 'cygwin.ico'
     DownloadFileIfNecessary 'https://www.iconfinder.com/icons/23880/download/ico' $iconsDir 'far.ico'
-    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/9106/download/ico' $iconsDir 'java.ico'
-    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8974/download/ico' $iconsDir 'python.ico'
-    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8978/download/ico' $iconsDir 'ruby.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/9106/download/ico'  $iconsDir 'java.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8974/download/ico'  $iconsDir 'python.ico'
+    DownloadFileIfNecessary 'https://www.iconfinder.com/icons/8978/download/ico'  $iconsDir 'ruby.ico'
     echo $null > $iconsInstalledMarker
-    Write-Host "  icons obtained!"
+    Write-Host '  icons obtained!'
   } else {
-    Write-Host "Icons already obtained"
+    Write-Host 'Icons already obtained'
   }
 }
 
 Function InstallSettings() {
   Write-Host
-  $settingsInstalledMarker = $Tmp + '\settings.marker'
+  $settingsInstalledMarker = MarkerName($settingsMrk)
   if (!(Test-Path $settingsInstalledMarker)) {
-    Write-Host "Copying settings:"
-    $overrideSilent = 0x14
-    $shell = New-Object -com shell.application
-    $source = $shell.NameSpace($CurrentDir + '\preconfigs')
-    $target = $shell.NameSpace($CurrentDir)
-    $target.CopyHere($source.items(), $overrideSilent)
+    Write-Host 'Copying settings:'
+    $source = "$CurrentDir\preconfigs"
+    $target = $CurrentDir
+    CopyDirContent $source $target
     echo $null > $settingsInstalledMarker
-    Write-Host "  settings copied!"
+    Write-Host '  settings copied!'
   } else {
-    Write-Host "Settings already copied"
+    Write-Host 'Settings already copied'
   }
 }
 
 Function BuildLogic() {
   Write-Host "current dir: $CurrentDir"
-  Write-Host "tmp dir: $Tmp"
-  Write-Host "target dir: $CmderDir"
+  Write-Host "tmp     dir: $Tmp"
+  Write-Host "target  dir: $CmderDir"
 
   InstallCmder
   InstallCygwin
@@ -589,6 +628,9 @@ Function BuildLogic() {
   DownloadIcons
   InstallGitPrompt
   InstallSettings
+  
+  Write-Host
+  Write-Host "Cmder built successfully!"
 }
 
 # Run script

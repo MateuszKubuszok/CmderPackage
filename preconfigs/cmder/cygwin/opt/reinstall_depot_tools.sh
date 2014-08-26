@@ -1,4 +1,5 @@
-cd /opt/depot_tools
+#!/bin/sh
+cd /opt/depot_tools/
 git clean -f -d -x
-python update_depot_tools.py
-python win_toolchain/toolchain2013.py --express
+./update_depot_tools.bat
+gyp_python $(cygpath --windows /opt/depot_tools/win_toolchain/toolchain2013.py) --express --local=$(cygdrive --windows /tmp)

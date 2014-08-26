@@ -41,16 +41,20 @@ and confirm your choice with `Y`.
 Building
 ---
 
-Run in a PowerShell (make sure you are running the one located in `syswow64` not
-`system32`):
+There is know problem that script crashes at some task and needs to be
+restarted. I am unable to tell what is the reason of those crashed as they seem
+to appear randomly. While script is able to resume work from place where it
+finished it is still an inconveniece.
+
+Additionally Cygwin setup crashes when started in x64 PowerShell, so it should
+be run with PowerShell x86.
+
+Run in a PowerShell:
 
     .\build_cmder.ps1
 
 In the process Cygwin installer will appear - let it do the job. If you want to
 change installation use `setup_cygwin.ps1` script.
-
-If Cygwin installation crashes at the beginning try switching from x86 to x64
-PowerShell (or from x64 to x86).
 
 Cygwin setup
 ---

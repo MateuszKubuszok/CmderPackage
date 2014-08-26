@@ -12,7 +12,7 @@ $MsysgitDir = "$CmderDir\vendor\msysgit"
 $7zaEXE        = "$CygwinDir\lib\p7zip\7za.exe"
 $cabextractEXE = "$CygwinDir\bin\cabextract.exe"
 $gitEXE        = "$MsysgitDir\bin\git"
-$lnEXE         = "$MsysgitDir\bin\ln"
+$lnEXE         = "$CygwinDir\bin\ln"
 $tarEXE        = "$MsysgitDir\bin\tar.exe"
 $unzipEXE      = "$MsysgitDir\bin\unzip.exe"
 $wgetEXE       = "$CygwinDir\bin\wget.exe"
@@ -58,7 +58,7 @@ $nightCoreURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.10/n
 $nightCodeTmp   = 'nightcode-0.3.10-standalone.jar'
 $nightCodeMrk   = 'nightcode-0.3.10'
 $sublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3059 x64.zip"'
-$sublimeTextURL = 'Sublime Text Build 3059 x64.zip'
+$sublimeTextTmp = 'Sublime-Text-Build-3059-x64.zip'
 $sublimeTextMrk = 'sublime-text-3059'
 $gitPromptMrk   = 'gitprompt'
 $symlinksMrk    = 'symlinks'
@@ -95,14 +95,27 @@ Function EnsureFileDownloaded($source, $target) {
   }
 }
 
-Function CopyDirContent($file, $target) {
-  Write-Host "  Extracting $file into $target..."
+Function CopyDirContent($source, $target) {
+  Write-Host "  copying $source into $target..."
+  EnsureSourceExists $source
   New-Item $target -type directory -Force
   $overrideSilent = 0x14
   $shell = New-Object -com shell.application
-  $content = $shell.NameSpace($file)
+  $content = $shell.NameSpace($source)
   $shell.NameSpace($target).CopyHere($content.items(), $overrideSilent)
-  return 1
+  if (Test-Path -Path "$target\*") {
+    return 1
+  } else {
+    Write-Host " failed to copy $source content!"
+    exit 1
+  }
+}
+
+Function EnsureSourceExists($source) {
+  if (!(Test-Path $source)) {
+    Write-Host "  $source doesn't exists!"
+    exit 1
+  }
 }
 
 Function DownloadWithWgetIfNecessary($source, $targetDir, $targetName) {
@@ -526,7 +539,7 @@ Function InstallSublimeText() {
       echo $null > $sublimeTextInstalledMarker
       Write-Host "  Sublime Text 3 extracted into $sublimeTextDir!"
     } else {
-      Write-Host '  LightTable extraction failed!'
+      Write-Host '  Sublime Text 3 extraction failed!'
       exit 1
     }
   } else {
@@ -559,11 +572,11 @@ Function CreateSymlinks() {
   $symlinkCreatedMarker = MarkerName($symlinksMrk)
   if (!(Test-Path $symlinkCreatedMarker)) {
     Write-Host 'Creating symlinks:'
-    CreateCygwinSymlink "$CygwinDir\bin\atom.exe"         "$CygwinDir\usr\local\bin\atom\atom.exe"
-    CreateCygwinSymlink "$CygwinDir\bin\light-table.exe"  "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
-    CreateCygwinSymlink "$CygwinDir\bin\nightcode.jar"    "$CygwinDir\usr\local\bin\nightcode\nightcode-0.3.10-standalone.jar"
-    CreateCygwinSymlink "$CygwinDir\bin\sublime_text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime_text.exe"
-    echo $null > $symlinkCreatedMarker
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\atom.exe"         "$CygwinDir\usr\local\bin\atom\atom.exe"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\light-table.exe"  "$CygwinDir\usr\local\bin\LightTable\LightTable.exe"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\nightcode.jar"    "$CygwinDir\usr\local\bin\nightcode\$nightCodeTmp"
+    CreateCygwinSymlink "$CygwinDir\usr\local\bin\sublime_text.exe" "$CygwinDir\usr\local\bin\sublime-text\sublime_text.exe"
+    #echo $null > $symlinkCreatedMarker
     Write-Host '  symlinks created!'
   } else {
     Write-Host 'Symlinks already created'

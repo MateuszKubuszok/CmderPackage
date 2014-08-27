@@ -498,7 +498,7 @@
 						<key name="Task2" modified="2014-08-27 12:00:01" build="140814">
 					<value name="Name" type="string" data="{PowerShell x86}"/>
 					<value name="GuiArgs" type="string" data="/dir &quot;%userprofile%&quot;"/>
-					<value name="Cmd1" type="string" data="powershell"/>
+					<value name="Cmd1" type="string" data="%SystemRoot%\syswow64\WindowsPowerShell\v1.0\powershell.exe"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
 					<value name="Hotkey" type="dword" data="00000000"/>
@@ -509,7 +509,7 @@
 					<value name="GuiArgs" type="string" data="/dir &quot;%userprofile%&quot;"/>
 					<value name="Active" type="dword" data="00000000"/>
 					<value name="Count" type="dword" data="00000001"/>
-					<value name="Cmd1" type="string" data="%SystemRoot%\syswow64\WindowsPowerShell\v1.0\powershell.exe"/>
+					<value name="Cmd1" type="string" data="powershell"/>
 				</key>
 						<key name="Task4" modified="2014-08-27 12:00:01" build="140814">
 					<value name="Name" type="string" data="{Cygwin}"/>

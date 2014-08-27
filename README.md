@@ -11,6 +11,7 @@ several features preinstalled:
  * [Gradle](http://www.gradle.org/downloads) build system,
  * [Clojure](http://clojure.org/) REPL and [Leiningen](http://leiningen.org/)
    builder,
+ * [Node.js](http://nodejs.org/) Node.js REPL,
  * [Python](https://www.python.org/) REPL,
  * [Ruby](https://www.ruby-lang.org/) REPL,
  * [Far](http://www.farmanager.com/) manager,
@@ -41,13 +42,8 @@ and confirm your choice with `Y`.
 Building
 ---
 
-There is know problem that script crashes at some task and needs to be
-restarted. I am unable to tell what is the reason of those crashed as they seem
-to appear randomly. While script is able to resume work from place where it
-finished it is still an inconveniece.
-
-Additionally Cygwin setup crashes when started in x64 PowerShell, so it should
-be run with PowerShell x86.
+Cygwin setup crashes when started in x64 PowerShell, so script ensures that it
+will be run only with PowerShell x86.
 
 Run in a PowerShell:
 
@@ -55,6 +51,10 @@ Run in a PowerShell:
 
 In the process Cygwin installer will appear - let it do the job. If you want to
 change installation use `setup_cygwin.ps1` script.
+
+Once build is completed run `Cmder.exe` and let it update Conemu to its newest
+version. With older one (distributed with Cmder) startup errors might appear,
+and some functionalities (like copying text by highlighting) are not available.
 
 Cygwin setup
 ---
@@ -139,6 +139,10 @@ Oracle's Java platform and development kit.
 [Clojure](http://clojure.org/) - Clojure programming language.
 
 [Leiningen](http://leiningen.org/) - builder for Clojure applications.
+
+### Node.js
+
+[Node.js](http://nodejs.org/) - JS development platform.
 
 ### Python
 

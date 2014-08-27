@@ -13,6 +13,7 @@ $7zaEXE        = "$CygwinDir\lib\p7zip\7za.exe"
 $CabextractEXE = "$CygwinDir\bin\cabextract.exe"
 $GitEXE        = "$MsysgitDir\bin\git"
 $LnEXE         = "$CygwinDir\bin\ln"
+$MsiexecEXE    = 'msiexec.exe'
 $TarEXE        = "$MsysgitDir\bin\tar.exe"
 $UnzipEXE      = "$MsysgitDir\bin\unzip.exe"
 $WgetEXE       = "$CygwinDir\bin\wget.exe"
@@ -40,6 +41,9 @@ $JvmMrk         = 'jre-8u20'
 $JdkURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jdk-8u20-windows-x64.exe'
 $JdkTmp         = 'jdk-8u20-windows-x64.exe'
 $JdkMrk         = 'jdk-8u20'
+$NodeJSURL      = 'http://nodejs.org/dist/v0.10.31/x64/node-v0.10.31-x64.msi'
+$NodeJSTmp      = 'node-v0.10.31-x64.msi'
+$NodeJSMrk      = 'node-v0.10.31'
 $ClojureURL     = 'http://central.maven.org/maven2/org/clojure/clojure/1.6.0/clojure-1.6.0.zip'
 $ClojureTmp     = 'clojure-1.6.0.zip'
 $ClojureMrk     = 'clojure-1.6.0'
@@ -329,7 +333,7 @@ Function InstallFar() {
     $farDir = 'cmder/far'
     $7zaArgs = @('x', $far7Z, "-o$farDir", '-y')
     New-Item "$CmderDir\far" -type directory -Force
-    $farInstallation = Start-Process -FilePath $7zaEXE -ArgumentList $7zaArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    $farInstallation = Start-Process -FilePath $7zaEXE -ArgumentList $7zaArgs -PassThru -NoNewWindow -Wait
     if ($farInstallation.ExitCode -eq 0) {
       echo $null > $farInstalledMarker
       Write-Host "  Far extracted into $farDir!"
@@ -367,11 +371,11 @@ Function InstallPortableJVM() {
   $jvmInstalledMarker = MarkerName($JvmMrk)
   if (!(Test-Path $jvmInstalledMarker)) {
     Write-Host 'Obtaining portable JVM:'
-    DOwnloadFromOracleIfNecessary $jvmURL $Tmp $JvmTmp
+    $jvmTar = DownloadFromOracleIfNecessary $jvmURL $Tmp $JvmTmp
     $target = "$CmderDir\jvm"
     New-Item $target -type directory -Force
-    $tarArgs = @('-C', "$target", '-xzf', "./tmp/$JvmTmp", '--strip-components=1')
-    $jvmInstallation = Start-Process -FilePath $tarEXE -ArgumentList $tarArgs -PassThru -NoNewWindow -Wait -WorkingDirectory '.'
+    $tarArgs = @('-C', "$target", '-xzf', "$jvmTar", '--strip-components=1')
+    $jvmInstallation = Start-Process -FilePath $tarEXE -ArgumentList $tarArgs -PassThru -NoNewWindow -Wait
     if ($jvmInstallation.ExitCode -eq 0) {
       echo $null > $jvmInstalledMarker
       Write-Host "  JVM installed into $target!"
@@ -431,6 +435,27 @@ Function InstallPortableJDK() {
   } else {
     Write-Host 'Portable JDK already installed'
   }
+}
+
+Function InstallNodeJS() {
+  Write-Host
+  $nodejsInstalledMarker = MarkerName($NodeJSMrk)
+  if (!(Test-Path $nodejsInstalledMarker)) {
+    Write-Host 'Obtaining portable Node.js:'
+    $nodejsMSI = DownloadWithWgetIfNecessary $NodejsURL $Tmp $NodeJSTmp
+    $nodejsDir = "$CmderDir\node"
+    $msiexecArgs = @('/a', "$nodejsMSI", '/qb', "TARGETDIR=$nodejsDir")
+    $msiexec = Start-Process -FilePath $MsiexecEXE -ArgumentList $msiexecArgs -PassThru -NoNewWindow -Wait
+    if ($msiexec.ExitCode -eq 0) {
+      #echo $null > $nodejsInstalledMarker
+      Write-Host "  Node.js extracted into $nodejsDir!"
+    } else {
+      Write-Host '  Node.js extraction failed!'
+      exit 1
+    }
+  } else {
+    Write-Host 'Node.js already extracted'
+  } 
 }
 
 Function InstallClojure() {
@@ -644,6 +669,7 @@ Function BuildLogic() {
   InstallFarPlugin
   InstallPortableJVM
   InstallPortableJDK
+  #InstallNodeJS
   InstallClojure
   InstallLeiningen
   InstallGradle

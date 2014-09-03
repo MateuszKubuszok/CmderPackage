@@ -151,8 +151,10 @@ $CygwinPackages = @(
   '-C', 'Python',
   # Category Ruby `
   '-C', 'Ruby',
-  # Shells
+  # Shells `
   '-P', 'bash-completion',
+  # System `
+  '-P', 'dosbox',
   # Category Utils `
   '-P', 'ncurses',
   '-P', 'wdiff',

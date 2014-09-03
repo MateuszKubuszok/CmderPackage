@@ -8,9 +8,11 @@ mkdir -p '/usr/local/bin/sublime-text/Packages/User/'
 echo '{
   "installed_packages":
   [
+    "AAAPackageDev",
     "Ada",
     "Bison",
     "C++11",
+    "CUDA C++",
     "Coco R Syntax Highlighting",
     "CoffeeScript",
     "CSS3",
@@ -21,12 +23,14 @@ echo '{
     "HTML5",
     "MSBuild",
     "nginx",
+    "PowerShell",
+    "PowerShellUtils",
     "Sass",
     "Scheme",
     "SideBarEnhancements",
     "SublimeCodeIntel",
     "SublimeLinter",
-    "SublimeLinter-contrib-clang",
+    "SublimeLinter-cppcheck",
     "SublimeREPL",
     "stposh",
     "Swift",

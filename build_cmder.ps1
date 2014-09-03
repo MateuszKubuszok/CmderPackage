@@ -20,7 +20,7 @@ $JdkDir         = "$CmderDir\jdk"
 $ClojureDir     = "$CmderDir\clojure"
 $LeinDir        = "$CygwinDir\bin"
 $LeinBatDir     = "$CmderDir\bin"
-$GradleDir      = "$CmderDir\tools"
+$GradleDir      = "$CmderDir\tools\gradle"
 $NodejsDir      = "$CmderDir\node"
 $AtomDir        = "$CygwinULBDir\atom"
 $LightTableDir  = "$CygwinULBDir\LightTable"
@@ -69,9 +69,9 @@ $ClojureTmp     = 'clojure-1.6.0.zip'
 $ClojureMrk     = 'clojure-1.6.0'
 $LeiningenURL   = 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein'
 $LeiningenMrk   = 'leiningen'
-$GradleURL      = 'https://services.gradle.org/distributions/gradle-1.11-all.zip'
-$GradleTmp      = 'gradle-1.11-all.zip'
-$GradleMrk      = 'gradle-1.11'
+$GradleURL      = 'https://services.gradle.org/distributions/gradle-2.0-all.zip'
+$GradleTmp      = 'gradle-2.0-all.zip'
+$GradleMrk      = 'gradle-2.0'
 $NodeJSURL      = 'http://nodejs.org/dist/v0.10.31/x64/node-v0.10.31-x64.msi'
 $NodeJSTmp      = 'node-v0.10.31-x64.msi'
 $NodeJSMrk      = 'node-v0.10.31'
@@ -81,12 +81,12 @@ $AtomMrk        = 'atom'
 $LightTableURL  = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.6.7/LightTableWin.zip'
 $LightTableTmp  = 'LightTableWin-0.6.7.zip'
 $LightTableMrk  = 'lighttable-0.6.7'
-$NightCoreURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.10/nightcode-0.3.10-standalone.jar'
-$NightCodeTmp   = 'nightcode-0.3.10-standalone.jar'
-$NightCodeMrk   = 'nightcode-0.3.10'
-$SublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3059 x64.zip"'
-$SublimeTextTmp = 'Sublime-Text-Build-3059-x64.zip'
-$SublimeTextMrk = 'sublime-text-3059'
+$NightCoreURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.11/nightcode-0.3.11-standalone.jar'
+$NightCodeTmp   = 'nightcode-0.3.11-standalone.jar'
+$NightCodeMrk   = 'nightcode-0.3.11'
+$SublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3065 x64.zip"'
+$SublimeTextTmp = 'Sublime-Text-Build-3065-x64.zip'
+$SublimeTextMrk = 'sublime-text-3065'
 $SymlinksMrk    = 'symlinks'
 
 # Cygwin packages - list of packages to install
@@ -561,7 +561,7 @@ Function InstallGradle() {
   if (!(Test-Path $gradleInstalledMarker)) {
     Write-Host 'Obtaining Gradle:'
     $GradleZIP = DownloadFileIfNecessary $GradleURL $Tmp $GradleTmp
-    if (CopyDirContent $gradleZIP $GradleDir) {
+    if (CopyDirContent "$gradleZIP\$GradleMrk" $GradleDir) {
       echo $null > $gradleInstalledMarker
       Write-Host "  Gradle extracted into $GradleDir!"
     } else {
@@ -662,7 +662,7 @@ Function InstallSublimeText() {
   $sublimeTextInstalledMarker = MarkerName($SublimeTextMrk)
   if (!(Test-Path $sublimeTextInstalledMarker)) {
     Write-Host 'Obtaining Sublime Text 3:'
-    $SublimeTextZIP = DownloadWithWgetIfNecessary $SublimeTextURL $Tmp $SublimeTextTmp
+    $sublimeTextZIP = DownloadWithWgetIfNecessary $SublimeTextURL $Tmp $SublimeTextTmp
     if (CopyDirContent $sublimeTextZIP $SublimeTextDir) {
       echo $null > $sublimeTextInstalledMarker
       Write-Host "  Sublime Text 3 extracted into $SublimeTextDir!"

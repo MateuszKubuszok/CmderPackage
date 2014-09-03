@@ -123,6 +123,7 @@ $CygwinPackages = @(
   '-P', 'gcc',
   '-P', 'gdb',
   '-P', 'git',
+  '-P', 'git-completion',
   '-P', 'libcrypt-devel',
   '-P', 'libsqlite3-devel',
   '-P', 'make',
@@ -150,6 +151,8 @@ $CygwinPackages = @(
   '-C', 'Python',
   # Category Ruby `
   '-C', 'Ruby',
+  # Shells
+  '-P', 'bash-completion',
   # Category Utils `
   '-P', 'ncurses',
   '-P', 'wdiff',

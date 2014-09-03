@@ -1,8 +1,7 @@
 #!/bin/sh
 mkdir -p /usr/local/bin/atom/.atom
 if [ ! -d "$USERPROFILE/.atom" ]; then
-  export CYGWIN="winsymlinks:lnk"
-  ln -s -v /usr/local/bin/atom/.atom $USERPROFILE
+  cygstart --action=runas cmd.exe /C mklink /D "$USERPROFILE\.atom" $(cygpath -w /usr/local/bin/atom/.atom)
 fi
 /usr/local/bin/atom/resources/app/apm/node_modules/atom-package-manager/bin/apm.cmd install \
   atom-grails \

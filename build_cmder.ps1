@@ -442,16 +442,17 @@ Function InstallDepotTools() {
   $depotToolsInstalledMarker = MarkerName($DepotToolsMrk)
   if (!(Test-Path $depotToolsInstalledMarker)) {
     Write-Host 'Obtaining depot-tools:'
-    $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir)
-    New-Item $DepotToolsDir -type directory -Force
-    $depotToolsInstallation = Start-Process $GitEXE -ArgumentList $gitArgs -PassThru -Wait -NoNewWindow
-    if ($depotToolsInstallation.ExitCode -eq 0) {
-      echo $null > $depotToolsInstalledMarker
-      Write-Host "  depottools installed into $DepotToolsDir!"
-    } else {
-      Write-Host '  depottools installation failed!'
-      exit 1
+    if (!(Test-Path "$DepotToolsDir\.git")) {
+      $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir)
+      New-Item $DepotToolsDir -type directory -Force
+      $depotToolsInstallation = Start-Process $GitEXE -ArgumentList $gitArgs -PassThru -Wait -NoNewWindow
+      if ($depotToolsInstallation.ExitCode -ne 0) {
+        Write-Host '  depottools installation failed!'
+        exit 1
+      }
     }
+    echo $null > $depotToolsInstalledMarker
+    Write-Host "  depottools installed into $DepotToolsDir!"
   } else {
     Write-Host 'depottools already installed'
   }

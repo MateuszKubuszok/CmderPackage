@@ -1,4 +1,8 @@
+# ignores cmder/ directory (default conf) and file (e.g. link)
 /cmder/
+cmder
+# ignores tmp/ directory (downloads)
 /tmp/
+# ignores Cygwin log
 setup.log
 setup.log.full

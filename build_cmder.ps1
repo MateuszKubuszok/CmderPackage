@@ -41,9 +41,9 @@ $WgetEXE        = "$CygwinDir\bin\wget.exe"
 # Components - subject to change if we want to e.g. update some dependency
 ################################################################################
 
-$CmderURL       = 'https://github.com/bliker/cmder/releases/download/v1.1.3/cmder.zip'
-$CmderTmp       = 'cmder-v1.1.3.zip'
-$CmderMrk       = 'cmder-v1.1.3'
+$CmderURL       = 'https://github.com/bliker/cmder/releases/download/v1.1.4.1/cmder.zip'
+$CmderTmp       = 'cmder-v1.1.4.1.zip'
+$CmderMrk       = 'cmder-v1.1.4.1'
 $FarURL         = 'http://www.farmanager.com/files/Far30b4040.x64.20140810.7z'
 $FarTmp         = 'Far30b4040.x64.20140810.7z'
 $FarMrk         = 'far30b4040.x64.20140810'
@@ -286,7 +286,7 @@ Function InstallCmder() {
   if (!(Test-Path $cmderInstalledMarker)) {
     Write-Host 'Obtaining Cmder:'
     $CmderZIP = DownloadFileIfNecessary $CmderURL $Tmp $CmderTmp
-    if (CopyDirContent $cmderZIP $CurrentDir) {
+    if (CopyDirContent $cmderZIP $CmderDir) {
       echo $null > $cmderInstalledMarker
       Write-Host "  Cmder extracted into $CmderDir!"
     } else {

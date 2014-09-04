@@ -15,6 +15,7 @@ $IconsDir       = "$CmderDir\icons"
 $PreconfigsDir  = "$CurrentDir\preconfigs"
 $AptCygDir      = "$CygwinDir\bin"
 $DepotToolsDir  = "$CygwinDir\opt\depot_tools"
+$ClocDir        = "$CygwinDir\bin"
 $JvmDir         = "$CmderDir\jvm"
 $JdkDir         = "$CmderDir\jdk"
 $ClojureDir     = "$CmderDir\clojure"
@@ -56,6 +57,9 @@ $AptCygURL      = 'https://apt-cyg.googlecode.com/svn/trunk/apt-cyg'
 $AptCygMrk      = 'aptcyg'
 $AptCygTmp      = 'apt-cyg'
 $GitPromptMrk   = 'gitprompt'
+$ClocURL        = 'http://downloads.sourceforge.net/project/cloc/cloc/v1.62/cloc-1.62.exe'
+$ClocTmp        = 'cloc.exe'
+$ClocMrk        = 'cloc-1.62'
 $DepotToolsURL  = 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 $DepotToolsMrk  = 'depottools'
 $JvmURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-windows-x64.tar.gz'
@@ -81,7 +85,7 @@ $AtomMrk        = 'atom'
 $LightTableURL  = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.6.7/LightTableWin.zip'
 $LightTableTmp  = 'LightTableWin-0.6.7.zip'
 $LightTableMrk  = 'lighttable-0.6.7'
-$NightCoreURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.11/nightcode-0.3.11-standalone.jar'
+$NightCodeURL   = 'https://github.com/oakes/Nightcode/releases/download/0.3.11/nightcode-0.3.11-standalone.jar'
 $NightCodeTmp   = 'nightcode-0.3.11-standalone.jar'
 $NightCodeMrk   = 'nightcode-0.3.11'
 $SublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3065 x64.zip"'
@@ -458,6 +462,25 @@ Function InstallDepotTools() {
   }
 }
 
+Function InstallCloc() {
+  Write-Host
+  $clocInstalledMarker = MarkerName($ClocMrk)
+  if (!(Test-Path $clocInstalledMarker)) {
+    Write-Host 'Obtaining cloc:'
+    $clocEXE = DownloadFileIfNecessary $ClocURL $Tmp $ClocTmp
+    if (CopyItem $clocEXE "$ClocDir\$ClocTmp") {
+      echo $null > $clocInstalledMarker
+      Write-Host '  cloc obtained!'
+    } else {
+      Write-Host '  cloc installation failed!'
+      exit 1
+    }
+  } else {
+    Write-Host 'cloc already obtained'
+  }
+}
+
+
 # Java tasks
 ################################################################################
 
@@ -650,7 +673,7 @@ Function InstallNightCode() {
   $nightcodeInstalledMarker = MarkerName($NightCodeMrk)
   if (!(Test-Path $nightcodeInstalledMarker)) {
     Write-Host 'Obtaining NightCode:'
-    $NightCodeJar = DownloadFileIfNecessary $NightCoreURL $Tmp $NightCodeTmp
+    $NightCodeJar = DownloadFileIfNecessary $NightCodeURL $Tmp $NightCodeTmp
     if (CopyItem $NightCodeJar "$NightCodeDir\$NightCodeTmp") {
       echo $null > $nightcodeInstalledMarker
       Write-Host '  NightCode obtained!'
@@ -705,10 +728,15 @@ Function BuildLogic() {
   Write-Host "tmp dir     : $Tmp"
   Write-Host "target dir  : $CmderDir"
 
+  # Cmder and Cygwin have to be installed first - they that come up with tools
+  # we use later
   InstallCmder
   InstallCygwin
+  # Now we can install some Cygwin-related utils...
   InstallAptCyg
   InstallDepotTools
+  InstallCloc
+  # ...followed by enhanced capabilities of both Cmder and Cygwin
   InstallFar
   InstallFarPlugin
   InstallPortableJVM
@@ -717,10 +745,13 @@ Function BuildLogic() {
   InstallLeiningen
   InstallGradle
   InstallNodeJS
+  # Now lets add some nice text editors to it
   InstallAtom
   InstallLightTable
   InstallNightCode
   InstallSublimeText
+  # Finally we add some personalization - symlinks, ConEmu icons and
+  # configuration files
   CreateSymlinks
   DownloadIcons
   InstallGitPrompt

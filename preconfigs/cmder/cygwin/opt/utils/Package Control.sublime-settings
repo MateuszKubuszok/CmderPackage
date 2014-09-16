@@ -1,0 +1,32 @@
+{
+  "installed_packages":
+  [
+    "AAAPackageDev",
+    "Ada",
+    "Bison",
+    "C++11",
+    "CUDA C++",
+    "Coco R Syntax Highlighting",
+    "CoffeeScript",
+    "CSS3",
+    "Git",
+    "GitGutter",
+    "Grails",
+    "jQuery",
+    "HTML5",
+    "MSBuild",
+    "nginx",
+    "PowerShell",
+    "PowerShellUtils",
+    "Sass",
+    "Scheme",
+    "SideBarEnhancements",
+    "SublimeCodeIntel",
+    "SublimeLinter",
+    "SublimeLinter-cppcheck",
+    "SublimeREPL",
+    "stposh",
+    "Swift",
+    "Theme - Soda"
+  ]
+}

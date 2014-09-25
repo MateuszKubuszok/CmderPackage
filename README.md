@@ -15,6 +15,11 @@ several features preinstalled:
  * [Python](https://www.python.org/) REPL,
  * [Ruby](https://www.ruby-lang.org/) REPL,
  * [Far](http://www.farmanager.com/) manager,
+ * portable versions of text editors and IDEs:
+   * [Atom](https://atom.io/) text editor,
+   * [LightTable](http://www.lighttable.com/) IDE,
+   * [Nightcode](nightcode.info) IDE,
+   * [Sublime Text](http://www.sublimetext.com/3) text editor,
  * some preconfiguration:
    * Cmder have Cygwin, Clojure REPL, Python REPL and Ruby REPL
      [tasks](https://code.google.com/p/conemu-maximus5/wiki/SettingsTasks)
@@ -65,19 +70,11 @@ Once Cygwin is installed it can be further configured by running:
 
 and choosing packages to install/remove.
 
-Boost and depottools
+Usage
 ---
 
-To install boost run:
-
-    /opt/install_boost.sh
-
-in Cygwin console. Depot tools can be similarly (re)installed with command:
-
-    /opt/reinstall_depot_tools.sh
-
-Depottools directory can then be added to PATH with `seet_PATH_depottools.ps1`
-(run with administrator's priviledges).
+Details on how to use of added features and programs can be found
+[here](USAGE.md).
 
 Libusb
 ---
@@ -151,3 +148,19 @@ Oracle's Java platform and development kit.
 ### Ruby
 
 [Ruby](https://www.ruby-lang.org/) - Ruby programming language.
+
+### Atom
+
+[Atom](https://atom.io/) - Atom text editor.
+
+### LightTable
+
+[LightTable](http://www.lighttable.com/) - LightTable Clojure IDE.
+
+### NightCode
+
+[Nightcode](nightcode.info) - Nightcode Clojure IDE.
+
+### Sublime Text
+
+[Sublime Text](http://www.sublimetext.com/3) - Sublime Text 3 text editor.

@@ -447,7 +447,10 @@ Function InstallDepotTools() {
   if (!(Test-Path $depotToolsInstalledMarker)) {
     Write-Host 'Obtaining depot-tools:'
     if (!(Test-Path "$DepotToolsDir\.git")) {
-      $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir)
+      $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir,
+                   '--config', 'core.autocrlf=false',
+                   '--config', 'core.safecrlf=true',
+                   '--config', 'core.eol=lf',)
       New-Item $DepotToolsDir -type directory -Force
       $depotToolsInstallation = Start-Process $GitEXE -ArgumentList $gitArgs -PassThru -Wait -NoNewWindow
       if ($depotToolsInstallation.ExitCode -ne 0) {

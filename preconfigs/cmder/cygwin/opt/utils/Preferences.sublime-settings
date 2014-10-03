@@ -1,6 +1,16 @@
 {
+  "always_show_minimap_viewport": true,
+  "atomic_save": false,
+  "auto_complete_selector": "text, source",
+  "bold_folder_labels": true,
+  "caret_style": "phase",
   "color_scheme": "Packages/User/Twilight (SL).tmTheme",
-  "theme": "Soda Dark 3.sublime-theme",
+  "copy_with_empty_selection": false,
+  "default_line_ending": "unix",
   "font_size": 10,
+  "highlight_modified_tabs": true,
+  "tab_size": 2,
+  "theme": "Soda Dark 3.sublime-theme",
+  "trim_trailing_white_space_on_save": true,
   "rulers": [80, 120]
 }

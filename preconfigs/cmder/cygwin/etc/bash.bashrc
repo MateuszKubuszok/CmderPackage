@@ -39,5 +39,6 @@ alias atom='atom.exe ' \
       light-table='light-table.exe ' \
       nightcode='java -jar nightcode.jar ' \
 	    sublime_text='sublime_text.exe ' \
+	    clojure='java -jar $(cygpath "$CMDER_PATH\clojure\clojure-1.6.0.jar") ' \
 	    gyp_python='/opt/depot_tools/python276_bin/python ' \
 	    winpath='cygpath --windows '

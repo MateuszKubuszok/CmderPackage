@@ -26,6 +26,11 @@
 # Exclude *dlls from TAB expansion
 export EXECIGNORE="*.dll"
 
+# Load global settings for input parsing and overrides them with ~/.inputrc
+# if such file exists
+bind -f /etc/inputrc
+export INPUTRC=~/.inputrc
+
 # Set a default prompt of: user@host and current_directory
 source /etc/git-prompt.sh
 PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\] $(__git_ps1 "(%s)")\nλ '

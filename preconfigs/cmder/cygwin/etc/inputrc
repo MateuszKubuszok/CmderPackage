@@ -1,0 +1,13 @@
+# Ignore case while completing
+set completion-ignore-case on
+
+# Make Bash 8bit clean
+set meta-flag on
+set convert-meta off
+set output-meta on
+
+# ^up, ^down, ^right, ^left
+"\e[1;5A": history-search-forward
+"\e[1;5B": history-search-backward
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word

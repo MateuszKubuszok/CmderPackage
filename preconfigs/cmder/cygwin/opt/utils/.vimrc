@@ -2,6 +2,13 @@
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
+" Makes VIM run Syntastic correctly.
+set shell=bash
+set noshelltemp
+
+" Enables pathogen plugin which allows runtime reloading of plugins
+call pathogen#infect()
+
 " Make backspace behave in a sane manner.
 set backspace=indent,eol,start
 
@@ -18,13 +25,10 @@ set number
 set hidden
 
 " By default Vim saves your last 8 commands.  We can handle more
-set history=1024
+set history=128
 
 " Make status bar visible all the time
 set laststatus=2
-
-" Enables pathogen plugin which allows runtime reloading of plugins
-call pathogen#infect()
 
 " Make F5 key displey undo tree
 nnoremap <F5> :GundoToggle<CR>

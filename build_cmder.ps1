@@ -14,7 +14,6 @@ $FarDir         = "$CmderDir\far"
 $IconsDir       = "$CmderDir\icons"
 $PreconfigsDir  = "$CurrentDir\preconfigs"
 $AptCygDir      = "$CygwinDir\bin"
-$DepotToolsDir  = "$CygwinDir\opt\depot_tools"
 $ClocDir        = "$CygwinDir\bin"
 $JvmDir         = "$CmderDir\jvm"
 $JdkDir         = "$CmderDir\jdk"
@@ -450,7 +449,7 @@ Function InstallDepotTools() {
       $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir,
                    '--config', 'core.autocrlf=false',
                    '--config', 'core.safecrlf=true',
-                   '--config', 'core.eol=lf',)
+                   '--config', 'core.eol=lf')
       New-Item $DepotToolsDir -type directory -Force
       $depotToolsInstallation = Start-Process $GitEXE -ArgumentList $gitArgs -PassThru -Wait -NoNewWindow
       if ($depotToolsInstallation.ExitCode -ne 0) {
@@ -772,6 +771,10 @@ if ([IntPtr]::size -eq 4) {
   BuildLogic
 } else {
   # 64-bit PowerShell cause some Start-Process to crash - restart task as 32-bit
-  Write-Host 'Run script again in 32-bit mode'
+  Write-Host 'Restarting in 32-bit mode'
+  $CurrentScript    = $MyInvocation.MyCommand.Name
+  $PowerShell32     = "$env:SystemRoot\syswow64\WindowsPowerShell\v1.0\powershell.exe"
+  $PowerShell32Args = @("$CurrentDir\$CurrentScript")
+  Start-Process $PowerShell32 -ArgumentList $PowerShell32Args -PassThru -Wait -NoNewWindow
 }
 

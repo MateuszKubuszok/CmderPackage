@@ -30,6 +30,10 @@ set history=128
 " Make status bar visible all the time
 set laststatus=2
 
+" Allow mouse usage
+set mouse=a
+set ttymouse=xterm2
+
 " Make F5 key displey undo tree
 nnoremap <F5> :GundoToggle<CR>
 " Make F8 key doisplay tagbar window

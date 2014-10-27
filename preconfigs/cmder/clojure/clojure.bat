@@ -1,2 +1,3 @@
 @echo off
-..\jvm\bin\java.exe -jar clojure-1.6.0.jar
+@CALL %~dp0%..\common_variables.bat
+%JAVA_PATH%\bin\java.exe -jar %CLOJURE_JAR_PATH%

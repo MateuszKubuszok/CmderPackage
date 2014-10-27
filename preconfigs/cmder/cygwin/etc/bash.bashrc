@@ -26,11 +26,6 @@
 # Exclude *dlls from TAB expansion
 export EXECIGNORE="*.dll"
 
-# Load global settings for input parsing and overrides them with ~/.inputrc
-# if such file exists
-bind -f /etc/inputrc
-export INPUTRC=~/.inputrc
-
 # Set a default prompt of: user@host and current_directory
 source /etc/git-prompt.sh
 PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\] $(__git_ps1 "(%s)")\nÎ» '
@@ -42,8 +37,8 @@ PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\] $(__git_ps1 "(%s)")\nÎ
 
 alias atom='atom.exe ' \
       light-table='light-table.exe ' \
-      nightcode='java -jar nightcode.jar ' \
+      nightcode='"$JAVA_PATH/bin/java.exe" -jar nightcode.jar ' \
 	    sublime_text='sublime_text.exe ' \
-	    clojure='java -jar $(cygpath "$CMDER_PATH\clojure\clojure-1.6.0.jar") ' \
 	    gyp_python='/opt/depot_tools/python276_bin/python ' \
-	    winpath='cygpath --windows '
+	    winpath='cygpath --windows ' \
+	  clojure='"$JAVA_PATH/bin/java.exe" -jar "$CLOJURE_JAR_PATH" '

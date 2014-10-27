@@ -3,3 +3,5 @@ gl=git log --oneline --all --graph --decorate  $*
 ls=ls --color $*
 pwd=cd
 clang++=clang
+clojure="%JAVA_PATH%\bin\java.exe" -jar "%CLOJURE_JAR_PATH%"
+

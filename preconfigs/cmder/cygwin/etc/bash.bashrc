@@ -28,6 +28,8 @@ export EXECIGNORE="*.dll"
 
 # Set a default prompt of: user@host and current_directory
 source /etc/git-prompt.sh
+GIT_PS1_SHOWDIRTYSTATE=
+GIT_PS1_SHOWUNTRACKEDFILES=
 PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\] $(__git_ps1 "(%s)")\nÎ» '
 
 # Uncomment to use the terminal colours set in DIR_COLORS
@@ -35,10 +37,12 @@ PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\h \[\e[33m\]\w\[\e[0m\] $(__git_ps1 "(%s)")\nÎ
 # Uncomment to use the terminal colours set in LS_COLORS
 # eval "$(dircolors -b /etc/LS_COLORS)"
 
+bind -f /etc/inputrc
+
 alias atom='atom.exe ' \
+      clojure='"$JAVA_PATH/bin/java.exe" -jar "$CLOJURE_JAR_PATH" ' \
       light-table='light-table.exe ' \
       nightcode='"$JAVA_PATH/bin/java.exe" -jar nightcode.jar ' \
-	    sublime_text='sublime_text.exe ' \
-	    gyp_python='/opt/depot_tools/python276_bin/python ' \
-	    winpath='cygpath --windows ' \
-	  clojure='"$JAVA_PATH/bin/java.exe" -jar "$CLOJURE_JAR_PATH" '
+      sublime_text='sublime_text.exe ' \
+      gyp_python='/opt/depot_tools/python276_bin/python ' \
+      winpath='cygpath --windows ' \

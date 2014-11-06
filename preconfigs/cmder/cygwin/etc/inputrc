@@ -10,4 +10,4 @@ set output-meta on
 "\e[1:5A": history-search-forward
 "\e[1:5B": history-search-backward
 "\e[1:5C": forward-word
-"\e[1;5D": backward-word
+"\e[1:5D": backward-word

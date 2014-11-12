@@ -14,6 +14,7 @@ $FarDir         = "$CmderDir\far"
 $IconsDir       = "$CmderDir\icons"
 $PreconfigsDir  = "$CurrentDir\preconfigs"
 $AptCygDir      = "$CygwinDir\bin"
+$DepotToolsDir  = "$CygwinDir\opt\depot_tools"
 $ClocDir        = "$CygwinDir\bin"
 $JvmDir         = "$CmderDir\jvm"
 $JdkDir         = "$CmderDir\jdk"
@@ -147,6 +148,7 @@ $CygwinPackages = @(
   '-P', 'libgmp-devel',
   '-P', 'gnuplot',
   # Category Net `
+  '-P', 'curl',
   '-P', 'whois',
   # Category PHP `
   '-C', 'PHP',

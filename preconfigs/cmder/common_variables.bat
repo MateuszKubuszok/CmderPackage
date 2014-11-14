@@ -13,7 +13,7 @@
 
 @SET DEPOT_TOOLS_WIN_TOOLCHAIN=1
 @SET DXSDK_DIR=%ProgramFiles(x86)%\Microsoft DirectX SDK (June 2010)
-@SET GYP_DEFINES=windows_sdk_path="%ProgramFiles(x86)%\Windows Kits\8.1" component=shared_library
+@SET GYP_DEFINES=windows_sdk_path="%ProgramFiles(x86)%\Windows Kits\8.0" component=shared_library
 @SET GYP_GENERATOR_FLAGS=config=Debug
 @SET GYP_GENERATORS=msvs-ninja,ninja
 @SET GYP_MSVS_VERSION=2013e

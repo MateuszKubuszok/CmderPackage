@@ -58,7 +58,7 @@ Chromium development
 
 As package was created with Chromium building in mind it has some Chromium
 toolchain support already added. It has already configured environment
-variables:
+variables (they just need to be enabled in common_variables.bat file):
 
  * `DEPOT_TOOLS_WIN_TOOLCHAIN` (`1`),
  * `DXSDK_DIR` (`C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)`),
@@ -74,7 +74,9 @@ variables:
 and [Depot tools](http://dev.chromium.org/developers/how-tos/depottools) already
 checked out in Cygwin in `/opt/depot_tools`. However directory need to be
 initialized with `/opt/reinstall_depot_tools.sh` to have Git, specific Python
-version GYP and some SDKs downloaded.
+version GYP and some SDKs downloaded. This must be preceeded by unlocking either
+Express or Professional VS2013 toolchain (first one is not supported by Chromium
+at the moment).
 
 Once initialized toolchain's Python can be called as `gyp_python` inside Cygwin
 and just `python` inside CMD. However to work, GYP required adding path to depot

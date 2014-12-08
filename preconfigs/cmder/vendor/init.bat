@@ -3,9 +3,6 @@
 :: Created as part of cmder project
 
 @CALL %~dp0%..\common_variables.bat
-@SET DEPOT_TOOLS_PATH=%CYGWIN_PATH%\opt\depot_tools
-@SET PYTHON_PATH=%DEPOT_TOOLS_PATH%\python276_bin
-@SET PATH=%PATH_EXTENSION%;%DEPOT_TOOLS_PATH%;%PYTHON_PATH%;%PATH%
 
 :: Change the prompt style
 :: Mmm tasty lamb

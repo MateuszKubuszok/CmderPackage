@@ -6,6 +6,7 @@ Import-Module BitsTransfer
 $CurrentDir     = split-path -parent $MyInvocation.MyCommand.Definition
 $Tmp            = "$CurrentDir\tmp"
 $CmderDir       = "$CurrentDir\cmder"
+$ConEmuDir      = "$CmderDir\vendor\conemu-maximus5"
 $CygwinDir      = "$CmderDir\cygwin"
 $CygwinULBDir   = "$CygwinDir\usr\local\bin"
 $MsysgitDir     = "$CmderDir\vendor\msysgit"
@@ -44,10 +45,12 @@ $WgetEXE        = "$CygwinDir\bin\wget.exe"
 $CmderURL       = 'https://github.com/bliker/cmder/releases/download/v1.1.4.1/cmder.zip'
 $CmderTmp       = 'cmder-v1.1.4.1.zip'
 $CmderMrk       = 'cmder-v1.1.4.1'
+$ConEmuURL      = 'https://conemu.github.io/install2.ps1'
+$ConEmuMrk      = "conemu-$CmderMrk"
 $FarURL         = 'http://www.farmanager.com/files/Far30b4242.x86.20150117.7z'
 $FarTmp         = 'Far30b4242.x86.20150117.7z'
 $FarMrk         = 'far30b4242.x86.20150117'
-$FarPluginMrk   = "farplugin-$FarMrk-$CmderMrk"
+$FarPluginMrk   = "farplugin-$FarMrk-$ConEmuMrk"
 $IconsMrk       = 'icons'
 $SettingsMrk    = 'settings'
 $CygwinURL      = 'https://cygwin.com/setup-x86_64.exe'
@@ -62,20 +65,20 @@ $ClocTmp        = 'cloc.exe'
 $ClocMrk        = 'cloc-1.62'
 $DepotToolsURL  = 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 $DepotToolsMrk  = 'depottools'
-$JvmURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jre-8u20-windows-x64.tar.gz'
-$JvmTmp         = 'jre-8u20-windows-x64.tar.gz'
-$JvmMrk         = 'jre-8u20'
-$JdkURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u20-b26/jdk-8u20-windows-x64.exe'
-$JdkTmp         = 'jdk-8u20-windows-x64.exe'
-$JdkMrk         = 'jdk-8u20'
+$JvmURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u31-b13/jre-8u31-windows-x64.tar.gz'
+$JvmTmp         = 'jre-8u31-windows-x64.tar.gz'
+$JvmMrk         = 'jre-8u31'
+$JdkURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u31-b13/jdk-8u31-windows-x64.exe'
+$JdkTmp         = 'jdk-8u31-windows-x64.exe'
+$JdkMrk         = 'jdk-8u31'
 $ClojureURL     = 'http://central.maven.org/maven2/org/clojure/clojure/1.6.0/clojure-1.6.0.zip'
 $ClojureTmp     = 'clojure-1.6.0.zip'
 $ClojureMrk     = 'clojure-1.6.0'
 $LeiningenURL   = 'https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein'
 $LeiningenMrk   = 'leiningen'
-$GradleURL      = 'https://services.gradle.org/distributions/gradle-2.0-all.zip'
-$GradleTmp      = 'gradle-2.0-all.zip'
-$GradleMrk      = 'gradle-2.0'
+$GradleURL      = 'https://services.gradle.org/distributions/gradle-2.2.1-all.zip'
+$GradleTmp      = 'gradle-2.2.1-all.zip'
+$GradleMrk      = 'gradle-2.2.1'
 $NodeJSURL      = 'http://nodejs.org/dist/v0.10.36/x64/node-v0.10.36-x64.msi'
 $NodeJSTmp      = 'node-v0.10.36-x64.msi'
 $NodeJSMrk      = 'node-v0.10.36'
@@ -298,6 +301,29 @@ Function InstallCmder() {
     Write-Host "Cmder already extracted"
   }
   $env:Path += ";$MsysgitDir\bin"
+}
+
+Function UpgradeConEmu() {
+  Write-Host
+  $conEmuUpgradedMarker = MarkerName($ConEmuMrk)
+  if (!(Test-Path $conEmuUpgradedMarker)) {
+    Write-Host 'Upgrading ConEmu:'
+    $command = "set ver 'preview'; " +
+               "set dst '$ConEmuDir'; " +
+               'set lnk $FALSE; ' +
+               'set run $FALSE; ' +
+               "iex ((new-object net.webclient).DownloadString('$ConEmuURL'))"
+    powershell -NoProfile -ExecutionPolicy Unrestricted -Command $command
+    if ($?) {
+      echo $null > $conEmuUpgradedMarker
+      Write-Host "  ConEmu upgraded for $CmderDir!"
+    } else {
+      Write-Host "  ConEmu upgrade failed!"
+      exit 1
+    }
+  } else {
+    Write-Host "ConEmu already upgraded"
+  }
 }
 
 Function InstallFar() {
@@ -735,6 +761,7 @@ Function BuildLogic() {
   # Cmder and Cygwin have to be installed first - they that come up with tools
   # we use later
   InstallCmder
+  UpgradeConEmu
   InstallCygwin
   # Now we can install some Cygwin-related utils...
   InstallAptCyg
@@ -779,4 +806,3 @@ if ([IntPtr]::size -eq 4) {
   $PowerShell32Args = @("$CurrentDir\$CurrentScript")
   Start-Process $PowerShell32 -ArgumentList $PowerShell32Args -PassThru -Wait -NoNewWindow
 }
-

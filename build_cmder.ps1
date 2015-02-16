@@ -16,6 +16,7 @@ $IconsDir       = "$CmderDir\icons"
 $PreconfigsDir  = "$CurrentDir\preconfigs"
 $AptCygDir      = "$CygwinDir\bin"
 $DepotToolsDir  = "$CygwinDir\opt\depot_tools"
+$GypDir         = "/opt/gyp"
 $ClocDir        = "$CygwinDir\bin"
 $JvmDir         = "$CmderDir\jvm"
 $JdkDir         = "$CmderDir\jdk"
@@ -32,6 +33,7 @@ $SublimeTextDir = "$CygwinULBDir\sublime-text"
 $7zaEXE         = "$CygwinDir\lib\p7zip\7za.exe"
 $CabextractEXE  = "$CygwinDir\bin\cabextract.exe"
 $GitEXE         = "$MsysgitDir\bin\git.exe"
+$SvnEXE         = "$CygwinDir\bin\svn.exe"
 $LnEXE          = "$CygwinDir\bin\ln.exe"
 $MsiexecEXE     = 'msiexec.exe'
 $TarEXE         = "$CygwinDir\bin\tar.exe"
@@ -65,6 +67,8 @@ $ClocTmp        = 'cloc.exe'
 $ClocMrk        = 'cloc-1.62'
 $DepotToolsURL  = 'https://chromium.googlesource.com/chromium/tools/depot_tools.git'
 $DepotToolsMrk  = 'depottools'
+$GypURL         = 'http://gyp.googlecode.com/svn/trunk/'
+$GypMrk         = 'gyp'
 $JvmURL         = 'http://download.oracle.com/otn-pub/java/jdk/8u31-b13/jre-8u31-windows-x64.tar.gz'
 $JvmTmp         = 'jre-8u31-windows-x64.tar.gz'
 $JvmMrk         = 'jre-8u31'
@@ -474,7 +478,7 @@ Function InstallDepotTools() {
   if (!(Test-Path $depotToolsInstalledMarker)) {
     Write-Host 'Obtaining depot-tools:'
     if (!(Test-Path "$DepotToolsDir\.git")) {
-      $GitArgs = @('clone', $DepotToolsURL, $DepotToolsDir,
+      $gitArgs = @('clone', $DepotToolsURL, $DepotToolsDir,
                    '--config', 'core.autocrlf=false',
                    '--config', 'core.safecrlf=true',
                    '--config', 'core.eol=lf')
@@ -489,6 +493,27 @@ Function InstallDepotTools() {
     Write-Host "  depottools installed into $DepotToolsDir!"
   } else {
     Write-Host 'depottools already installed'
+  }
+}
+
+Function InstallGyp() {
+  Write-Host
+  $gypInstalledMarker = MarkerName($GypMrk)
+  if (!(Test-Path $gypInstalledMarker)) {
+    Write-Host 'Obtaining GYP:'
+    if (!(Test-Path "$GypDir\.svn")) {
+      $svnArgs = @('checkout', $GypURL, $GypDir)
+      New-Item $DepotToolsDir -type directory -Force
+      $gypInstallation = Start-Process $SvnEXE -ArgumentList $svnArgs -PassThru -Wait -NoNewWindow
+      if ($gypInstallation.ExitCode -ne 0) {
+        Write-Host '  GYP installation failed!'
+        exit 1
+      }
+    }
+    echo $null > $gypInstalledMarker
+    Write-Host "  GYP installed into $GypDir!"
+  } else {
+    Write-Host 'GYP already installed'
   }
 }
 
@@ -766,6 +791,7 @@ Function BuildLogic() {
   # Now we can install some Cygwin-related utils...
   InstallAptCyg
   InstallDepotTools
+  InstallGyp
   InstallCloc
   # ...followed by enhanced capabilities of both Cmder and Cygwin
   InstallFar

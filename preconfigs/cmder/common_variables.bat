@@ -32,4 +32,6 @@ goto VS2013PROFESSIONAL_END
 @SET GYP_DEFINES=component=shared_library
 :VS2013PROFESSIONAL_END
 
-@SET PATH=%PATH%;%CYGWIN_PATH%\bin;%CYGWIN_PATH%\usr\sbin;%JAVA_PATH%\bin;%JDK_PATH%\bin;%GYP_PATH%;%GRADLE_PATH%\bin;%NODE_PATH%
+REM Disabled by default as apparently this creates VS build error C1902
+REM @SET PATH=%PATH%;%CYGWIN_PATH%\bin;%CYGWIN_PATH%\usr\sbin
+@SET PATH=%PATH%;%JAVA_PATH%\bin;%JDK_PATH%\bin;%GYP_PATH%;%GRADLE_PATH%\bin;%NODE_PATH%

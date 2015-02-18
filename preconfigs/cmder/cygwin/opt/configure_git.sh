@@ -1,7 +1,9 @@
+#!/bin/sh
 GitSet="git config --global "
 
 echo "Git [core] settings"
-$GitSet core.autocrlf            true
+$GitSet core.autocrlf            false
+$GitSet core.safecrlf            true
 $GitSet core.filemode            false
 $GitSet core.deltaBaseCacheLimit 16
 $GitSet core.editor              vim

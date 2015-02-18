@@ -1,16 +1,17 @@
 #!/bin/sh
-BOOST_VERSION=boost_1_56_0
-BOOST_DIR=/opt/$BOOST_VERSION
-if [ ! -d $BOOST_DIR ]; then
-  BOOST_TMP=/tmp/$BOOST_VERSION.tar.gz
-  if [ ! -f $BOOST_TMP ]; then
-    wget http://skylink.dl.sourceforge.net/project/boost/boost/1.56.0/$BOOST_VERSION.tar.gz -O $BOOST_TMP
+BoostVersion=boost_1_56_0
+BoostDir=/opt/$BoostVersion
+if [ ! -d $BoostDir ]; then
+  BoostTmp=/tmp/$BoostVersion.tar.gz
+  if [ ! -f $BoostTmp ]; then
+    wget http://skylink.dl.sourceforge.net/project/boost/boost/1.56.0/$BoostVersion.tar.gz \
+      -O $BoostTmp
   fi
   cd /opt
   echo Extracting
-  tar -xzvf $BOOST_TMP
+  tar -xzvf $BoostTmp
 fi
-cd $BOOST_DIR
+cd $BoostDir
 echo Bootstraping
 ./bootstrap.sh
 echo Installing

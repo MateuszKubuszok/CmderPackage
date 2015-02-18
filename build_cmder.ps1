@@ -95,9 +95,9 @@ $LightTableMrk  = 'lighttable-0.7.2'
 $NightCodeURL   = 'https://github.com/oakes/Nightcode/releases/download/0.4.3/nightcode-0.4.3-standalone.jar'
 $NightCodeTmp   = 'nightcode-0.4.3-standalone.jar'
 $NightCodeMrk   = 'nightcode-0.4.3'
-$SublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3069 x64.zip"'
-$SublimeTextTmp = 'Sublime-Text-Build-3069-x64.zip'
-$SublimeTextMrk = 'sublime-text-3069'
+$SublimeTextURL = '"http://c758482.r82.cf2.rackcdn.com/Sublime Text Build 3070 x64.zip"'
+$SublimeTextTmp = 'Sublime-Text-Build-3070-x64.zip'
+$SublimeTextMrk = 'sublime-text-3070'
 $SymlinksMrk    = 'symlinks'
 
 # Cygwin packages - list of packages to install

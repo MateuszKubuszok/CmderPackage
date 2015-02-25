@@ -2,44 +2,36 @@
 Python=/opt/depot_tools/python276_bin/python
 
 Target=/opt/libchrome
-GitDir='.git'
-SparseFile="$GitDir/info/sparse-checkout"
 
-ChromiumGitURL=https://chromium.googlesource.com/chromium/src
+ChromiumSVNURL=http://src.chromium.org/chrome/trunk/src/
 BuildToolsGitURL=https://chromium.googlesource.com/chromium/buildtools
 GYPGitURL=https://chromium.googlesource.com/external/gyp
 ICUGitURL=https://chromium.googlesource.com/chromium/deps/icu52.git
 PsychoGitURL=https://chromium.googlesource.com/chromium/deps/psyco_win32
 TestingGitURL=https://chromium.googlesource.com/chromium/testing/gtest
 
-if [ ! -d "$Target/$GitDir" ]; then
+if [ ! -d "$Target/.svn" ]; then
   echo Settings up repository:
-  git init $Target
+  svn checkout --depth empty $ChromiumSVNURL $Target
   cd $Target
-  git remote add -f origin $ChromiumGitURL
-  git config core.sparsecheckout true
+  svn update --set-depth empty chrome/
+  svn update --set-depth empty third_party/
 else
   echo Opening repository
   cd $Target
 fi
 
-echo 'Fetching newest Chromium (sadly whole...):'
-rm -f $SparseFile
-echo '/base/*' >> $SparseFile
-echo '/build/*' >> $SparseFile
-echo '/buildtools/*' >> $SparseFile
-echo '/chrome/VERSION' >> $SparseFile
-echo '/testing/*' >> $SparseFile
-echo '/third_party/android_crazy_linker/*' >> $SparseFile
-echo '/third_party/ashmem/*' >> $SparseFile
-echo '/third_party/icu/*' >> $SparseFile
-echo '/third_party/libevent/*' >> $SparseFile
-echo '/third_party/libxml/*' >> $SparseFile
-echo '/third_party/modp_b64/*' >> $SparseFile
-echo '/third_party/zlib/*' >> $SparseFile
-echo '/tools/gyp/*' >> $SparseFile
-git fetch
-git reset --hard origin/master
+echo 'Fetching newest Chromium (necessary part):'
+svn update --set-depth infinity base/
+svn update --set-depth infinity build/
+svn update --set-depth empty    chrome/VERSION
+svn update --set-depth infinity testing/
+svn update --set-depth infinity third_party/android_crazy_linker/
+svn update --set-depth infinity third_party/ashmem/
+svn update --set-depth infinity third_party/libevent/
+svn update --set-depth infinity third_party/libxml/
+svn update --set-depth infinity third_party/modp_b64/
+svn update --set-depth infinity third_party/zlib/
 
 if [ ! -d buildtools ]; then
   echo 'Fetching buildtools:'
@@ -51,7 +43,7 @@ if [ ! -d testing/gtest ]; then
   git clone $TestingGitURL testing/gtest
 fi
 
-if [ ! -f third_party/icu/icu.gyp ]; then
+if [ ! -d third_party/icu ]; then
   echo 'Fetching ICU:'
   git clone $ICUGitURL third_party/icu
 fi

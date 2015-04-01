@@ -10,6 +10,7 @@
 @SET JRE_PATH=%CMDER_PATH%jre
 @SET GYP_PATH=%CMDER_PATH%cygwin\opt\gyp
 @SET GRADLE_PATH=%CMDER_PATH%tools\gradle
+@SET SBT_PATH=%CMDER_PATH%tools\sbt
 @SET NODE_PATH=%CMDER_PATH%node
 
 REM Visual Studio 2013 Express toolchain
@@ -34,4 +35,4 @@ goto VS2013PROFESSIONAL_END
 
 REM Disabled by default as apparently this creates VS build error C1902
 REM @SET PATH=%PATH%;%CYGWIN_PATH%\bin;%CYGWIN_PATH%\usr\sbin
-@SET PATH=%PATH%;%JAVA_PATH%\bin;%JDK_PATH%\bin;%GYP_PATH%;%GRADLE_PATH%\bin;%NODE_PATH%
+@SET PATH=%PATH%;%JAVA_PATH%\bin;%JDK_PATH%\bin;%GYP_PATH%;%GRADLE_PATH%\bin;%SBT_PATH%\bin;%NODE_PATH%

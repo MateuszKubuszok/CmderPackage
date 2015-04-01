@@ -24,6 +24,7 @@ $ClojureDir     = "$CmderDir\clojure"
 $LeinDir        = "$CygwinDir\bin"
 $LeinBatDir     = "$CmderDir\bin"
 $GradleDir      = "$CmderDir\tools\gradle"
+$SbtDir         = "$CmderDir\tools\sbt"
 $NodejsDir      = "$CmderDir\node"
 $AtomDir        = "$CygwinULBDir\atom"
 $LightTableDir  = "$CygwinULBDir\LightTable"
@@ -83,6 +84,9 @@ $LeiningenMrk   = 'leiningen'
 $GradleURL      = 'https://services.gradle.org/distributions/gradle-2.2.1-all.zip'
 $GradleTmp      = 'gradle-2.2.1-all.zip'
 $GradleMrk      = 'gradle-2.2.1'
+$SbtURL         = 'https://dl.bintray.com/sbt/native-packages/sbt/0.13.8/sbt-0.13.8.zip'
+$SbtTmp         = 'sbt-0.13.8.zip'
+$SbtMrk         = 'sbt-0.13.8'
 $NodeJSURL      = 'http://nodejs.org/dist/v0.12.0/x64/node-v0.12.0-x64.msi'
 $NodeJSTmp      = 'node-v0.12.0-x64.msi'
 $NodeJSMrk      = 'node-v0.12.0'
@@ -657,6 +661,24 @@ Function InstallGradle() {
   }
 }
 
+Function InstallSbt() {
+  Write-Host
+  $sbtInstalledMarker = MarkerName($SbtMrk)
+  if (!(Test-Path $sbtInstalledMarker)) {
+    Write-Host 'Obtaining SBT:'
+    $SbtZIP = DownloadFileIfNecessary $SbtURL $Tmp $SbtTmp
+    if (CopyDirContent "$SbtZIP\sbt" $SbtDir) {
+      echo $null > $sbtInstalledMarker
+      Write-Host "  SBT extracted into $SbtDir!"
+    } else {
+      Write-Host '  SBT extraction failed!'
+      exit 1
+    }
+  } else {
+    Write-Host 'SBT already extracted'
+  }
+}
+
 # JS tasks
 ################################################################################
 
@@ -801,6 +823,7 @@ Function BuildLogic() {
   InstallClojure
   InstallLeiningen
   InstallGradle
+  InstallSbt
   InstallNodeJS
   # Now lets add some nice text editors to it
   InstallAtom

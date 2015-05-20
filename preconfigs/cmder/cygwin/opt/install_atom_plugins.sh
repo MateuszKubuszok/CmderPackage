@@ -3,7 +3,7 @@ mkdir -p /usr/local/bin/atom/.atom
 if [ ! -d "$USERPROFILE/.atom" ]; then
   cygstart --action=runas cmd.exe /C mklink /D "$USERPROFILE\.atom" $(cygpath -w /usr/local/bin/atom/.atom)
 fi
-/usr/local/bin/atom/resources/app/apm/node_modules/atom-package-manager/bin/apm.cmd install \
+/usr/local/bin/atom/resources/app/apm/bin/apm.cmd install \
   atom-grails \
   atom-runner \
   autocomplete-plus \

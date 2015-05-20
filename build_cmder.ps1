@@ -90,9 +90,9 @@ $SbtMrk         = 'sbt-0.13.8'
 $NodeJSURL      = 'http://nodejs.org/dist/v0.12.0/x64/node-v0.12.0-x64.msi'
 $NodeJSTmp      = 'node-v0.12.0-x64.msi'
 $NodeJSMrk      = 'node-v0.12.0'
-$AtomURL        = 'https://atom.io/download/windows'
-$AtomTmp        = 'atom-windows.zip'
-$AtomMrk        = 'atom'
+$AtomURL        = 'https://github.com/atom/atom/releases/download/v0.200.0/atom-windows.zip'
+$AtomTmp        = 'atom-windows-v0.200.0.zip'
+$AtomMrk        = 'atom-v0.200.0'
 $LightTableURL  = 'https://d35ac8ww5dfjyg.cloudfront.net/playground/bins/0.7.2/LightTableWin.zip'
 $LightTableTmp  = 'LightTableWin-0.7.2.zip'
 $LightTableMrk  = 'lighttable-0.7.2'
@@ -223,7 +223,7 @@ Function CopyDirContent($source, $target) {
   if (!(Test-Path $target)) {
     New-Item $target -type directory -Force
   }
-  $overrideSilent = 0x14
+  $overrideSilent = 0x614
   $shell = New-Object -com shell.application
   $content = $shell.NameSpace($source)
   $shell.NameSpace($target).CopyHere($content.items(), $overrideSilent)

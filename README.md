@@ -70,6 +70,39 @@ Once Cygwin is installed it can be further configured by running:
 
 and choosing packages to install/remove.
 
+Installation troubleshoting
+---
+
+ * **Cygwin installation takes forever/fails** - some packages are available
+   only on mirrors.kernel.org. For some reason the site has sometimes problems
+   with FTP transfer and Cygwin Setup cannot either connect or has very slow
+   transfer. You can try to restart script (it saves your progress so you won't
+   have to install the same thing twice), or try to rerun it some time later.
+ * **Gradle installation freezes even though all files are extracted** - Gradle
+   actually hav > 10k files to extract, many of them so small that you might not
+   notice, that they are still being extracted when you check directory size
+   only. Wait a litte bit more.
+ * **Editors (Atom, Light Table, Sublime Text) fail to extract** - for some
+   reason, uknown to me, even though file is downloaded on first try script
+   might show error that it cannot find it and thus is unable to extract files.
+   I can only guess that it is some sort of race condition or other error on my
+   part resulting in call for extraction just before filesystem knows that
+   downloaded file arrived. Rerunning script helps (one might need to remove
+   `symlinks.mrk` file to try to create symlinks again).
+
+Portability
+---
+
+Basically whole package was build with portability in mind. OTTOOMH only
+`set_PATH_depottools.ps1` modifies `PATH` environment vairable and so it would
+require running (and cleaning after) on every system.
+
+I have noticed though that when package is synchronized with e.g. Copy.com
+software, symlinks (NTFS's junctions) get broken and functionality depending on
+them stops working. Therefore one needs to choose method of transfering the
+whole installation that would preserve them if he want to make use of its
+portability.
+
 Usage
 ---
 
@@ -79,13 +112,15 @@ Details on how to use of added features and programs can be found
 Libusb
 ---
 
-File can be found on [sourceforge](http://sourceforge.net/projects/libusb-win32/files/latest/download).
+If needed file can be found on
+[sourceforge](http://sourceforge.net/projects/libusb-win32/files/latest/download).
 
 License
 ---
 
-Scripts and configs are published with Apache 2.0 license. As such anyone can
-use them and modify to their needs.
+Scripts and my own configs are published with Apache 2.0 license. As such anyone
+can use them and modify to their needs. Configs being modifications are licensed
+like their originals.
 
 Disclaimer
 ---
@@ -124,12 +159,16 @@ package management in a apt-get like manner.
 [depot_tools](http://www.chromium.org/developers/how-tos/depottools) - scripts
 useful when working with Google code.
 
+[GYP](https://code.google.com/p/gyp/) - Chromium's builder.
+
 ### Java JRE and JDK
 
 [Java](http://www.oracle.com/technetwork/java/javase/downloads/index.html) -
 Oracle's Java platform and development kit.
 
 [Gradle](http://www.gradle.org/downloads) - build system (mainly) for Java.
+
+[SBT](http://www.scala-sbt.org/) - Simple Build Tool written in Scala.
 
 ### Clojure
 
@@ -164,3 +203,12 @@ Oracle's Java platform and development kit.
 ### Sublime Text
 
 [Sublime Text](http://www.sublimetext.com/3) - Sublime Text 3 text editor.
+
+### Apt-Cyg
+
+[apt-cyg](https://github.com/transcode-open/apt-cyg) - apt-get like manager for
+Cygwin.
+
+### CLOC
+
+[CLOC](http://cloc.sourceforge.net/) - Count Lines of Code.

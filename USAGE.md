@@ -101,6 +101,11 @@ Boost 1.55
 
 Run `/opt/install_boost.sh` to download, build and install Boost 1.55
 
+Chromium's libchrome and minichromium
+---
+
+Run `/opt/install_libchrome.sh` or `/opt/install_mini_chromium.sh` respectively.
+
 Text editor plugins
 ---
 
@@ -115,5 +120,5 @@ respectively.
 Known problems
 ===
 
-(Portable )Sublime Text crashes when you try try to run it from bash terminal.
+(Portable) Sublime Text crashes when you try try to run it from bash terminal.
 I don't know how to fix that (or even why it happens).

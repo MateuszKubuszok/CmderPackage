@@ -46,3 +46,5 @@ alias atom='atom.exe ' \
       sublime_text='sublime_text.exe ' \
       gyp_python='/opt/depot_tools/python276_bin/python ' \
       winpath='cygpath --windows ' \
+
+cmd /c chcp 65001 >> /dev/null
